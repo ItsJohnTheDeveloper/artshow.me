@@ -4,7 +4,7 @@ import Header from "./Header";
 type Props = {
   children: ReactNode;
 };
-
+// bg color: #202225
 const Layout: React.FC<Props> = (props) => (
   <div>
     <Header />
@@ -20,14 +20,22 @@ const Layout: React.FC<Props> = (props) => (
         box-sizing: inherit;
       }
 
+      a {
+        color: #b7bec9;
+      }
+
+      * {
+        color: white;
+      }
+
       body {
+        background-color: #202225;
         margin: 0;
         padding: 0;
         font-size: 16px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
           "Segoe UI Symbol";
-        background: rgba(0, 0, 0, 0.05);
       }
 
       input,
@@ -37,11 +45,7 @@ const Layout: React.FC<Props> = (props) => (
 
       button {
         cursor: pointer;
-      }
-    `}</style>
-    <style jsx>{`
-      .layout {
-        padding: 0 2rem;
+        background-color: #353840;
       }
     `}</style>
   </div>
