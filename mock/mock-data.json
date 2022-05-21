@@ -5,79 +5,78 @@
     "coverPhoto": "/artist/cover.jpg",
     "name": "Vincent van Gogh",
     "bio": "Vincent van Gogh was a Dutch Post-Impressionist painter who posthumously became one of the most famous and influential figures in Western art history. In a decade, he created about 2,100 artworks, including around 860 oil paintings, most of which date from the last two years of his life. They include landscapes, still lifes, portraits, and self-portraits, and are characterised by bold colours and dramatic, impulsive and expressive brushwork that contributed to the foundations of modern art. He was not commercially successful, struggled with severe depression and poverty, and committed suicide at the age of 37.",
-    "gallery": [
-      {
-        "id": "1",
-        "title": "Lorem ipsum",
-        "images": ["/gallery/art1.png", "image2", "image3"],
-        "size": "123x321",
-        "price": 1300.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "Simp treatment",
-        "images": ["/gallery/art2.jpg", "image2", "image3"],
-        "size": "123x321",
-        "price": 1950.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "Lorem ipsum",
-        "images": ["/gallery/art3.jpg", "image2", "image3"],
-        "size": "123x321",
-        "price": 1300.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "Lorem ipsum",
-        "images": ["/gallery/art4.jpeg", "image2", "image3"],
-        "size": "123x321",
-        "price": 49400.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "Lorem ipsum",
-        "images": ["/gallery/art5.webp", "image2", "image3"],
-        "size": "123x321",
-        "price": 1300.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "A walk in the woods",
-        "images": ["/gallery/art6.jpg", "image2", "image3"],
-        "size": "123x321",
-        "price": 1300.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "Jolly good time",
-        "images": ["/gallery/art7.jpg", "image2", "image3"],
-        "size": "123x321",
-        "price": 93000.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      },
-      {
-        "id": "1",
-        "title": "Lorem ipsum",
-        "images": ["/gallery/art8.jpg", "image2", "image3"],
-        "size": "123x321",
-        "price": 1300.0,
-        "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust.",
-        "category": "sample-category"
-      }
-    ]
-  }
+    "collections": ["Beatiful Abstract Art", "collection_id2"]
+  },
+  "collections": [
+    {
+      "id": "Beatiful Abstract Art",
+      "artistId": "1234",
+      "gallery": [
+        {
+          "id": "01",
+          "title": "Lorem ipsum",
+          "images": ["/gallery/art1.png", "image2", "image3"],
+          "size": "123x321",
+          "price": 1300.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "02",
+          "title": "Simp treatment",
+          "images": ["/gallery/art2.jpg", "image2", "image3"],
+          "size": "123x321",
+          "price": 1950.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "03",
+          "title": "Lorem ipsum",
+          "images": ["/gallery/art3.jpg", "image2", "image3"],
+          "size": "123x321",
+          "price": 1300.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "04",
+          "title": "Lorem ipsum",
+          "images": ["/gallery/art4.jpeg", "image2", "image3"],
+          "size": "123x321",
+          "price": 49400.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "05",
+          "title": "Lorem ipsum",
+          "images": ["/gallery/art5.webp", "image2", "image3"],
+          "size": "123x321",
+          "price": 1300.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "06",
+          "title": "A walk in the woods",
+          "images": ["/gallery/art6.jpg", "image2", "image3"],
+          "size": "123x321",
+          "price": 1300.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "07",
+          "title": "Jolly good time",
+          "images": ["/gallery/art7.jpg", "image2", "image3"],
+          "size": "123x321",
+          "price": 93000.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        },
+        {
+          "id": "08",
+          "title": "Lorem ipsum",
+          "images": ["/gallery/art8.jpg", "image2", "image3"],
+          "size": "123x321",
+          "price": 1300.0,
+          "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
+        }
+      ]
+    }
+  ]
 }
