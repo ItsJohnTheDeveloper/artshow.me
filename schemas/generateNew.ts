@@ -1,4 +1,5 @@
 import { SampleDocument } from "../models/sample";
+import { UserDocument } from "../models/user";
 
 export function generateNewSample(
   text: string,
@@ -6,8 +7,17 @@ export function generateNewSample(
   age: number
 ): SampleDocument {
   return {
-    text: text,
-    body: body,
-    age: age,
+    text,
+    body,
+    age,
   };
+}
+
+export function generateNewUser(
+  name: string,
+  password: string,
+  email: string,
+  profilePic: string = ""
+): UserDocument {
+  return { name, password, email, profilePic };
 }

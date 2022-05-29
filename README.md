@@ -25,7 +25,7 @@ You'll need to connect your db of choice. I'm using PostgreSQL hosted on Heroku
 `npm install prisma --save-dev`
 `npx prisma init`
 
-### Creating tables in remote DB
+### Creating tables in remote DB (Not applicable for noSQL)
 
 `npx prisma db push`
 

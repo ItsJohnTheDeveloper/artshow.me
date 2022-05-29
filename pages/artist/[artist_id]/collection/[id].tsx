@@ -39,7 +39,7 @@ const Collection = (props) => {
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
 
   return (
-    <Layout pageSpacing>
+    <Layout pageSpacing showCrumbs>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={6} lg={6} xl={7}>
           <img src={images[0]} style={{ width: "100%" }} />

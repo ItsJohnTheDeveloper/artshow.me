@@ -6,15 +6,15 @@ import prisma from "../lib/prisma";
 import Link from "next/link";
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const feed = await prisma.post.findMany({
-    where: { published: true },
-    include: {
-      author: {
-        select: { name: true },
-      },
-    },
-  });
-  return { props: { feed } };
+  // const feed = await prisma.post.findMany({
+  //   where: { published: true },
+  //   include: {
+  //     author: {
+  //       select: { name: true },
+  //     },
+  //   },
+  // });
+  return { props: { feed: [] } };
 };
 
 type Props = {

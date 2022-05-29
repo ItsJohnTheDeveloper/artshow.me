@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import axios from "../../../configuredAxios";
+import axios from "axios";
 import Layout from "../../../components/Layout";
-import prisma from "../../../lib/prisma";
 import ArtistProfile from "../../../components/Profile/Artist";
 import ArtPreview from "../../../components/Collection/Gallery/ArtPreview";
 import { Grid } from "@mui/material";
@@ -29,8 +28,6 @@ const Artist = (props) => {
 
   const [serverMessage, setServerMessage] = useState("");
 
-  console.log(defaultCollection);
-
   const handleUploadSamplePost = async () => {
     try {
       await axios.post("/sample", generateNewSample(text, body, age));
@@ -46,7 +43,7 @@ const Artist = (props) => {
   };
 
   return (
-    <Layout>
+    <Layout showCrumbs>
       <ArtistProfile data={artist} />
       <Grid
         style={{ padding: "64px 24px" }}

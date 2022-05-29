@@ -1,5 +1,6 @@
 import React from "react";
-import { Container, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Header from "./Header";
@@ -43,75 +44,85 @@ const StyledBreadCrumbs = () => {
     </div>
   );
 };
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
+
 type LayoutProps = {
   children: React.ReactNode;
   pageSpacing?: boolean;
+  showCrumbs?: boolean;
 };
 // bg color: #202225
-const Layout = ({ children, pageSpacing }: LayoutProps) => {
+const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
   return (
     <div>
-      <Header />
+      <ThemeProvider theme={darkTheme}>
+        <Header />
 
-      <Grid
-        container
-        justifyContent={"center"}
-        rowSpacing={1}
-        columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
-      >
         <Grid
-          item
-          xs={12}
-          sm={12}
-          md={pageSpacing ? 11 : 12}
-          lg={pageSpacing ? 11 : 12}
-          xl={pageSpacing ? 8 : 12}
+          container
+          justifyContent={"center"}
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
         >
-          {StyledBreadCrumbs()}
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={pageSpacing ? 11 : 12}
+            lg={pageSpacing ? 11 : 12}
+            xl={pageSpacing ? 8 : 12}
+          >
+            {showCrumbs && StyledBreadCrumbs()}
 
-          {children}
+            {children}
+          </Grid>
         </Grid>
-      </Grid>
 
-      <style jsx global>{`
-        html {
-          box-sizing: border-box;
-        }
+        <style jsx global>{`
+          html {
+            box-sizing: border-box;
+          }
 
-        *,
-        *:before,
-        *:after {
-          box-sizing: inherit;
-        }
+          *,
+          *:before,
+          *:after {
+            box-sizing: inherit;
+          }
 
-        a {
-          color: #b7bec9;
-        }
+          a {
+            color: #b7bec9;
+          }
 
-        * {
-          color: white;
-        }
+          * {
+            color: white;
+          }
 
-        body {
-          background-color: #202225;
-          margin: 0;
-          padding: 0;
-          font-size: 16px;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-            "Segoe UI Symbol";
-        }
+          body {
+            background-color: #202225;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+              Helvetica, Arial, sans-serif, "Apple Color Emoji",
+              "Segoe UI Emoji", "Segoe UI Symbol";
+          }
 
-        input,
-        textarea {
-          font-size: 16px;
-        }
+          input,
+          textarea {
+            font-size: 16px;
+          }
 
-        button {
-          cursor: pointer;
-          background-color: #353840;
-        }
-      `}</style>
+          button {
+            cursor: pointer;
+            background-color: #353840;
+          }
+        `}</style>
+      </ThemeProvider>
     </div>
   );
 };
