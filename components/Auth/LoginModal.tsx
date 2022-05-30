@@ -7,6 +7,8 @@ import axios from "axios";
 import Spacer from "../Spacer";
 import prisma from "../../lib/prisma";
 import { generateNewUser } from "../../schemas/generateNew";
+import { useState } from "react";
+import { useUser } from "../../contexts/user-context";
 
 const modalStyle = {
   position: "absolute",
@@ -19,29 +21,36 @@ const modalStyle = {
   p: 3,
 };
 
-type SignUpSubmitForm = {
-  name: string;
+type LoginSubmitForm = {
   email: string;
   password: string;
 };
 
-const SignUpModal = ({ open, setOpen }) => {
+const LoginModal = ({ open, setOpen }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSignUpSubmit = async (data: SignUpSubmitForm) => {
-    console.log(data);
+  const { signInUser } = useUser();
 
-    const user = generateNewUser(data.name, data.password, data.email);
+  const [error, setError] = useState("");
 
+  const onLoginSubmit = async (data: LoginSubmitForm) => {
+    setError("");
     try {
-      await axios.post("/auth/signup", user);
-      console.log(`Successfully created user: ${user.name}`);
+      const response = await axios.post("/auth/login", data);
+      console.log(response);
+      console.log(`Successfully logged in!`);
+
+      signInUser(response.data);
+
       setOpen(false);
     } catch (err) {
+      if (err.response.status === 403) {
+        setError("Invalid login credentials.");
+      }
       console.log(err);
     }
   };
@@ -61,27 +70,10 @@ const SignUpModal = ({ open, setOpen }) => {
           </IconButton>
         </div>
         <Typography id="modal-modal-description" variant="h5" component="h2">
-          Sign up
-        </Typography>
-        <Spacer y={1} />
-        <Typography variant="body1" color={"#afafaf"}>
-          Join the worlds fastest growing virtual art gallery.
+          Login
         </Typography>
         <Spacer y={6} />
-        <form onSubmit={handleSubmit(onSignUpSubmit)}>
-          <TextField
-            fullWidth
-            id="outlined-basic"
-            label="Artist Name"
-            variant="outlined"
-            {...register("name", { required: true })}
-          />
-          {errors.name && (
-            <Typography variant="body1" color={"#c33333"}>
-              Artist name required
-            </Typography>
-          )}
-          <Spacer y={2} />
+        <form onSubmit={handleSubmit(onLoginSubmit)}>
           <TextField
             fullWidth
             id="outlined-basic"
@@ -110,12 +102,17 @@ const SignUpModal = ({ open, setOpen }) => {
           )}
           <Spacer y={2} />
           <Button variant="contained" type={"submit"}>
-            Sign up
+            Login
           </Button>
+          {error && (
+            <Typography variant="body1" color={"#c33333"}>
+              {error}
+            </Typography>
+          )}
         </form>
       </Box>
     </Modal>
   );
 };
 
-export default SignUpModal;
+export default LoginModal;
