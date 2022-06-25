@@ -26,19 +26,21 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       // @ts-ignore
       const savedRefreshToken = await findRefreshTokenById(payload.jti);
 
+      console.log(savedRefreshToken);
+
       if (!savedRefreshToken || savedRefreshToken.revoked === true) {
-        return res.status(401).json("Unauthorized");
+        return res.status(401).json("Unauthorized-1");
       }
 
       const hashedToken = hashToken(refreshToken);
       if (hashedToken !== savedRefreshToken.hashedToken) {
-        return res.status(401).json("Unauthorized");
+        return res.status(401).json("Unauthorized-2");
       }
 
       // @ts-ignore
       const user = await findUserById(payload.userId);
       if (!user) {
-        return res.status(401).json("Unauthorized");
+        return res.status(401).json("Unauthorized-3");
       }
 
       await deleteRefreshToken(savedRefreshToken.id);
@@ -56,8 +58,8 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       console.log(`Refresh token successfully validated`);
       res.status(200).json({ accessToken, refreshToken: newRefreshToken });
     } catch (err) {
-      console.log(err);
-      res.status(403).json({ err: `An Error occurred: ${err}` });
+      console.log(err?.response?.data);
+      res.status(403).json(`An Error occurred: ${err}`);
     }
   } else {
     return res.status(405).json("405 - Method Not Allowed");

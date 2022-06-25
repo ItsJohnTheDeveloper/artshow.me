@@ -5,7 +5,6 @@ import { Close } from "@mui/icons-material";
 import axios from "axios";
 
 import Spacer from "../Spacer";
-import prisma from "../../lib/prisma";
 import { generateNewUser } from "../../schemas/generateNew";
 
 const modalStyle = {
@@ -48,7 +47,7 @@ const SignUpModal = ({ open, setOpen }) => {
 
   return (
     <Modal
-      BackdropProps={{ style: { backgroundColor: "rgb(0 0 0 / 24%)" } }}
+      BackdropProps={{ style: { backgroundColor: "rgb(0 0 0 / 33%)" } }}
       open={open}
       onClose={() => setOpen(false)}
       aria-labelledby="parent-modal-title"

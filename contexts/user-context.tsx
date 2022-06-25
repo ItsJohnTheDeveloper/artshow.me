@@ -1,62 +1,79 @@
-import axios from "axios";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../pages/_app";
+import {
+  clearLocalStorage,
+  getAndAuthenticateUser,
+} from "../utils/auth/authenticateUser";
 
-const UserContext = React.createContext(null);
-
-const UserProvider = ({ children }) => {
-  const defaultValues = { user: null };
-  const [state, setState] = useState(defaultValues);
-
-  const value = useMemo(() => [state, setState], [state]);
-
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+type signInUserProps = {
+  accessToken: string;
+  refreshToken: string;
+  id: string;
 };
 
-const useUser = () => {
+type useUserProps = {
+  logOutUser: Function;
+  setUser: any;
+  getUser: signInUserProps;
+};
+
+const setUserLocalStorage = (refreshToken, accessToken, id) => {
+  localStorage.setItem("refreshToken", refreshToken);
+  localStorage.setItem("accessToken", accessToken);
+  localStorage.setItem("_id", id);
+};
+
+const useValidateUser = () => {
+  const [user, setUser] = useState(null);
+
+  const setMountedUser = (value) => {
+    const { refreshToken, accessToken, id } = value;
+
+    setUser(value);
+    // set local storage with tokens and user id
+    setUserLocalStorage(refreshToken, accessToken, id);
+  };
+
+  useEffect(() => {
+    const fetchAuthedUser = async () => {
+      const authedUser = await getAndAuthenticateUser(user);
+      if (authedUser) {
+        setMountedUser(authedUser);
+      }
+    };
+
+    fetchAuthedUser();
+  }, []);
+
+  return { user, setUser };
+};
+
+const useUser = (): useUserProps => {
   const context = useContext(UserContext);
 
   if (!context) {
     throw new Error("useUser must be used within UserContext");
   }
-
-  const [state, setState] = context;
+  const { state, setUser } = context;
 
   const logOutUser = () => {
-    setState({ user: null });
+    setUser(null);
+    clearLocalStorage();
   };
 
-  const signInUser = (value) => {
-    setState({ user: value });
+  const setAuthedUser = (value: signInUserProps) => {
+    const { refreshToken, accessToken, id } = value;
+
+    setUser(value);
+    // set local storage with tokens and user id
+    setUserLocalStorage(refreshToken, accessToken, id);
   };
 
   return {
     logOutUser,
-    signInUser,
-    getUser: state.user,
+    setUser: setAuthedUser,
+    getUser: state?.user,
   };
 };
 
-// const useSidebar = () => {
-//   const context = useContext(SidebarContext);
-//   if (!context) {
-//     throw new Error("useSidebar must be used within SidebarContext");
-//   }
-//   const [state, setState] = context;
-
-//   const setIsHidden = (value) => {
-//     setState({ ...state, isHidden: value });
-//   };
-
-//   const setIsCollapsed = (value) => {
-//     setState({ ...state, isCollapsed: value });
-//   };
-
-//   return {
-//     isHidden: state.isHidden,
-//     isCollapsed: state.isCollapsed,
-//     setIsHidden,
-//     setIsCollapsed,
-//   };
-// };
-
-export { UserProvider, useUser };
+export { useValidateUser, useUser };

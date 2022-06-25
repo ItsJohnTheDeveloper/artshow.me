@@ -30,8 +30,6 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         existingUser.password
       );
 
-      console.log({ existingUser, validPassword });
-
       if (!validPassword) {
         return res.status(403).json("Invalid login credentials.");
       }
@@ -44,10 +42,8 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         userId: existingUser.id,
       });
 
-      delete existingUser.password;
-
-      console.log(`User: (${existingUser.email}) successfully logged in.`);
-      res.status(200).json({ info: existingUser, accessToken, refreshToken });
+      console.log(`User id: (${existingUser.email}) successfully logged in.`);
+      res.status(200).json({ id: existingUser.id, accessToken, refreshToken });
     } catch (err) {
       console.log(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });

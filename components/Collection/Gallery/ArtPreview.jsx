@@ -58,7 +58,6 @@ const ArtPreview = ({ data }) => {
 
   const thumbnail = images?.[0];
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
-  console.log({ data });
 
   return (
     <Grid item xs={4} sm={4} md={2} lg={2} xl={2}>

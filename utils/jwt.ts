@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 
+const expiresIn = "10m";
+
 export const generateAccessToken = (user) => {
   return jwt.sign({ userId: user.id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "5m",
+    expiresIn,
   });
 };
 
@@ -18,7 +20,7 @@ export const generateRefreshToken = (user, jti) => {
     },
     process.env.JWT_REFRESH_SECRET,
     {
-      expiresIn: "48h",
+      expiresIn,
     }
   );
 };

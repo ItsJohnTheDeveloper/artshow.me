@@ -32,13 +32,10 @@ const StyledProfileWrapper = styled("div")({
 const StyledProfileInfo = styled("div")({
   maxWidth: 760,
   textAlign: "center",
-  // display: "flex",
-  // justifyContent: "center",
 });
 
 const Artist = ({ data }) => {
   const [bioOpen, setBioOpen] = useState(false);
-  console.log(data);
   return (
     <div>
       <StyledCoverWrapper>

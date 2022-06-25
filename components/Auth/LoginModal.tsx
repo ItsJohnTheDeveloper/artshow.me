@@ -5,8 +5,6 @@ import { Close } from "@mui/icons-material";
 import axios from "axios";
 
 import Spacer from "../Spacer";
-import prisma from "../../lib/prisma";
-import { generateNewUser } from "../../schemas/generateNew";
 import { useState } from "react";
 import { useUser } from "../../contexts/user-context";
 
@@ -33,7 +31,7 @@ const LoginModal = ({ open, setOpen }) => {
     formState: { errors },
   } = useForm();
 
-  const { signInUser } = useUser();
+  const { setUser } = useUser();
 
   const [error, setError] = useState("");
 
@@ -44,11 +42,11 @@ const LoginModal = ({ open, setOpen }) => {
       console.log(response);
       console.log(`Successfully logged in!`);
 
-      signInUser(response.data);
+      setUser(response.data);
 
       setOpen(false);
     } catch (err) {
-      if (err.response.status === 403) {
+      if (err?.response?.status === 403) {
         setError("Invalid login credentials.");
       }
       console.log(err);
@@ -57,7 +55,7 @@ const LoginModal = ({ open, setOpen }) => {
 
   return (
     <Modal
-      BackdropProps={{ style: { backgroundColor: "rgb(0 0 0 / 24%)" } }}
+      BackdropProps={{ style: { backgroundColor: "rgb(0 0 0 / 33%)" } }}
       open={open}
       onClose={() => setOpen(false)}
       aria-labelledby="parent-modal-title"
