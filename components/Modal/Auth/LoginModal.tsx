@@ -4,9 +4,9 @@ import IconButton from "@mui/material/IconButton";
 import { Close } from "@mui/icons-material";
 import axios from "axios";
 
-import Spacer from "../Spacer";
+import Spacer from "../../Spacer";
 import { useState } from "react";
-import { useUser } from "../../contexts/user-context";
+import { useUser } from "../../../contexts/user-context";
 
 const modalStyle = {
   position: "absolute",

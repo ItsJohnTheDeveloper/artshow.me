@@ -7,12 +7,15 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(404).json("404 - No request body found");
     }
 
+    const { name, userId } = req.body;
+
     try {
-      const data = { data: req.body };
-      const response = await prisma.sample.create(data);
+      const response = await prisma.collection.create({
+        data: { name, userId },
+      });
 
       res.status(200).json(response);
-      console.log(`demo post successfully uploaded to DB`);
+      console.log(`Collection successfully Created`);
     } catch (err) {
       console.log(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });

@@ -24,6 +24,7 @@ export async function findRefreshTokenById(id) {
 }
 
 export async function deleteRefreshToken(id) {
+  console.log("attempting to delete Refresh token...");
   return await prisma.refreshToken.update({
     where: {
       id,

@@ -4,8 +4,8 @@ import IconButton from "@mui/material/IconButton";
 import { Close } from "@mui/icons-material";
 import axios from "axios";
 
-import Spacer from "../Spacer";
-import { generateNewUser } from "../../schemas/generateNew";
+import Spacer from "../../Spacer";
+import { generateNewUser } from "../../../schemas/generateNew";
 
 const modalStyle = {
   position: "absolute",

@@ -14,8 +14,8 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Menu, Close, Logout, ContactPage } from "@mui/icons-material";
-import SignUpModal from "./Auth/SignUpModal";
-import LoginModal from "./Auth/LoginModal";
+import SignUpModal from "./Modal/Auth/SignUpModal";
+import LoginModal from "./Modal/Auth/LoginModal";
 import { useUser } from "../contexts/user-context";
 
 const Header: React.FC = () => {

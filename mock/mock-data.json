@@ -1,8 +1,7 @@
 {
   "artist": {
-    "id": "1234",
-    "mainPhoto": "/artist/main.jpg",
-    "coverPhoto": "/artist/cover.jpg",
+    "profilePic": "/artist/main.jpg",
+    "coverPic": "/artist/cover.jpg",
     "name": "Vincent van Gogh",
     "bio": "Vincent van Gogh was a Dutch Post-Impressionist painter who posthumously became one of the most famous and influential figures in Western art history. In a decade, he created about 2,100 artworks, including around 860 oil paintings, most of which date from the last two years of his life. They include landscapes, still lifes, portraits, and self-portraits, and are characterised by bold colours and dramatic, impulsive and expressive brushwork that contributed to the foundations of modern art. He was not commercially successful, struggled with severe depression and poverty, and committed suicide at the age of 37.",
     "collections": ["Beatiful Abstract Art", "collection_id2"]
