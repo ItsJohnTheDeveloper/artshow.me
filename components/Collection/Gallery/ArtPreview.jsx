@@ -53,33 +53,32 @@ const StyledColumnLeft = styled("div")({
   paddingLeft: 2,
 });
 
-const ArtPreview = ({ data }) => {
-  const { id, images, title, price, size, collectionId, artistId } = data;
+const ArtPreview = ({ data, collectionName }) => {
+  const { id, image, name, price, width, height, collectionId, userId } = data;
 
-  const thumbnail = images?.[0];
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
 
   return (
     <Grid item xs={4} sm={4} md={2} lg={2} xl={2}>
       <StyledArtPaper>
         <Link
-          href={`/artist/${artistId}/collection/${collectionId}?artId=${id}`}
+          href={`/artist/${userId}/collection/${collectionName}?artId=${id}`}
         >
           <a style={{ textDecoration: "auto" }}>
             <StyledArtImageWrapper>
-              <StyleArtImage src={thumbnail} />
+              <StyleArtImage src={image} />
             </StyledArtImageWrapper>
             <StyledInfoWrapper>
               <StyledColumnRight>
-                <StyledTitle>{title}</StyledTitle>
+                <StyledTitle>{name}</StyledTitle>
                 <span style={{ color: "#999999", fontSize: 10, paddingTop: 3 }}>
-                  Size: {size}
+                  Size: w{width} X h{height}
                 </span>
               </StyledColumnRight>
               <StyledColumnLeft>
                 <span style={{ color: "grey", fontSize: 12 }}>Price</span>
                 <span style={{ fontSize: 14, fontWeight: "bold" }}>
-                  ${priceFormatted}
+                  {price ? `${priceFormatted}` : "na"}
                 </span>
               </StyledColumnLeft>
             </StyledInfoWrapper>

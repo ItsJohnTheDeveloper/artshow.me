@@ -1,11 +1,11 @@
 import { useState } from "react";
 import {
   Button,
-  Chip,
+  CircularProgress,
   Collapse,
-  Menu,
-  MenuItem,
+  Grid,
   TextField,
+  Typography,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { styled } from "@mui/system";
@@ -17,6 +17,10 @@ import { Add } from "@mui/icons-material";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
 import { Artist } from "../../models/Artist";
 import { Collection } from "../../models/Collection";
+import CollectionList from "../Collection/CollectionList";
+import ArtPreview from "../Collection/Gallery/ArtPreview";
+import { showAllOption } from "../../utils/helpers/getDefaultValues";
+import useCollections from "../../utils/hooks/useCollections";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -66,11 +70,16 @@ const Artist = ({ artist, collections }: ArtistProps) => {
   const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedCollection, setSelectedCollection] = useState("Show all");
+  const [selectedCollection, setSelectedCollection] = useState(showAllOption);
 
   const [createCollectionDialogOpen, setCreateCollectionDialogOpen] =
     useState(false);
+
+  const {
+    collectionGallery,
+    isLoading: isLoadingCollectionGallery,
+    error,
+  } = useCollections(selectedCollection, artist.id);
 
   const {
     register,
@@ -79,12 +88,10 @@ const Artist = ({ artist, collections }: ArtistProps) => {
     formState: { errors },
   } = useForm();
 
-  console.log(collections);
   const { getUser: loggedInUser } = useUser();
   const isMyProfile = loggedInUser && loggedInUser.id === artist?.id;
 
   const onEditProfileSubmit = async (data) => {
-    console.log(data);
     try {
       const res = await fetch(`/api/users/${artist.id}`, {
         method: "PATCH",
@@ -104,25 +111,13 @@ const Artist = ({ artist, collections }: ArtistProps) => {
   };
 
   const handleCreateCollectionSubmit = async (data) => {
-    console.log(data);
-
     const newCollectionData = { ...data, userId: artist.id };
     try {
       const res = await axios.post("/collection/create", newCollectionData);
       setCreateCollectionDialogOpen(false);
-      console.log(res);
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const handleChipOnClick = (e, open, setOpen) => {
-    if (isMyProfile) {
-      setAnchorEl(e.currentTarget);
-      setOpen(!open);
-      return;
-    }
-    setSelectedCollection(e.currentTarget.innerText);
   };
 
   return (
@@ -231,61 +226,62 @@ const Artist = ({ artist, collections }: ArtistProps) => {
           )}
         </StyledProfileWrapper>
       </div>
+      <CollectionList
+        artist={artist}
+        collections={collections}
+        selectedCollection={selectedCollection}
+        setSelectedCollection={setSelectedCollection}
+      />
+      {isLoadingCollectionGallery && (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <CircularProgress color="success" />
+        </div>
+      )}
+      {!collectionGallery.length && <Spacer y={40} />}
+      {selectedCollection.id === "all" &&
+        collectionGallery?.map((collection) => (
+          <>
+            <Typography variant="h4" marginLeft={3}>
+              {collection.collectionName}
+            </Typography>
 
-      <div
-        style={{
-          display: "flex",
-          overflow: "auto",
-          gap: 6,
-          margin: "24px 0px 24px 24px",
-          paddingBottom: 12,
-        }}
-      >
-        <Chip
-          label={"Show all"}
-          variant={selectedCollection === "Show all" ? "filled" : "outlined"}
-          onClick={(e) => setSelectedCollection(e.currentTarget.innerText)}
-          style={{ height: 46, marginRight: 6 }}
-        />
-        {collections.map((collection, i) => {
-          const [open, setOpen] = useState(false);
+            <Grid
+              style={{
+                padding: "64px 24px",
+              }}
+              container
+              spacing={{ xs: 1, sm: 2, md: 2, lg: 1.5, xl: 2 }}
+              columns={{ xs: 4, sm: 8, md: 8, lg: 10, xl: 12 }}
+            >
+              {collection?.paintings?.map((artwork, index) => (
+                <ArtPreview
+                  data={artwork}
+                  key={artwork.id}
+                  collectionName={collection.collectionName}
+                />
+              ))}
+            </Grid>
+          </>
+        ))}
 
-          return (
-            <>
-              <Chip
-                key={i}
-                label={collection.name}
-                variant={
-                  selectedCollection === collection.name ? "filled" : "outlined"
-                }
-                onClick={(e) => handleChipOnClick(e, open, setOpen)}
-                style={{ height: 46 }}
-              />
-              {isMyProfile && (
-                <Menu
-                  id="basic-menu"
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={() => setOpen(false)}
-                  MenuListProps={{
-                    "aria-labelledby": "basic-button",
-                  }}
-                >
-                  <MenuItem
-                    onClick={() => {
-                      setOpen(false);
-                      setSelectedCollection(collection.name);
-                    }}
-                  >
-                    View
-                  </MenuItem>
-                  <MenuItem onClick={() => setOpen(false)}>Edit</MenuItem>
-                </Menu>
-              )}
-            </>
-          );
-        })}
-      </div>
+      {selectedCollection.id !== "all" && (
+        <Grid
+          style={{
+            padding: "64px 24px",
+          }}
+          container
+          spacing={{ xs: 1, sm: 2, md: 2, lg: 1.5, xl: 2 }}
+          columns={{ xs: 4, sm: 8, md: 8, lg: 10, xl: 12 }}
+        >
+          {collectionGallery?.map((painting) => (
+            <ArtPreview
+              data={painting}
+              key={painting.id}
+              collectionName={selectedCollection.name}
+            />
+          ))}
+        </Grid>
+      )}
     </div>
   );
 };

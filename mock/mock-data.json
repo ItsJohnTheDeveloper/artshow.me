@@ -14,7 +14,7 @@
         {
           "id": "01",
           "title": "Lorem ipsum",
-          "images": ["/gallery/art1.png", "image2", "image3"],
+          "image": "/gallery/art1.png",
           "size": "123x321",
           "price": 1300.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -22,7 +22,7 @@
         {
           "id": "02",
           "title": "Simp treatment",
-          "images": ["/gallery/art2.jpg", "image2", "image3"],
+          "image": "/gallery/art2.jpg",
           "size": "123x321",
           "price": 1950.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -30,7 +30,7 @@
         {
           "id": "03",
           "title": "Lorem ipsum",
-          "images": ["/gallery/art3.jpg", "image2", "image3"],
+          "image": "/gallery/art3.jpg",
           "size": "123x321",
           "price": 1300.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -38,7 +38,7 @@
         {
           "id": "04",
           "title": "Lorem ipsum",
-          "images": ["/gallery/art4.jpeg", "image2", "image3"],
+          "image": "/gallery/art4.jpeg",
           "size": "123x321",
           "price": 49400.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -46,7 +46,7 @@
         {
           "id": "05",
           "title": "Lorem ipsum",
-          "images": ["/gallery/art5.webp", "image2", "image3"],
+          "image": "/gallery/art5.webp",
           "size": "123x321",
           "price": 1300.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -54,7 +54,7 @@
         {
           "id": "06",
           "title": "A walk in the woods",
-          "images": ["/gallery/art6.jpg", "image2", "image3"],
+          "image": "/gallery/art6.jpg",
           "size": "123x321",
           "price": 1300.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -62,7 +62,7 @@
         {
           "id": "07",
           "title": "Jolly good time",
-          "images": ["/gallery/art7.jpg", "image2", "image3"],
+          "image": "/gallery/art7.jpg",
           "size": "123x321",
           "price": 93000.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."
@@ -70,7 +70,7 @@
         {
           "id": "08",
           "title": "Lorem ipsum",
-          "images": ["/gallery/art8.jpg", "image2", "image3"],
+          "image": "/gallery/art8.jpg",
           "size": "123x321",
           "price": 1300.0,
           "description": "With the fine strokes of passionate paint delivers a fine view of the tree tops coated in ceramic flows through the dust."

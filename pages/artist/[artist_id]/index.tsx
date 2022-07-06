@@ -34,32 +34,11 @@ export const getServerSideProps = async ({ params }) => {
 };
 
 const Artist = (props) => {
-  const collections = props.data.mockCollections;
-  const artist = props.data.artist;
-  const defaultCollection = collections.filter(
-    (collection) => collection.id === artist.collections[0]
-  )[0];
+  const { artist, collections, mockCollections } = props.data;
 
   return (
     <Layout showCrumbs>
-      <ArtistProfile artist={artist} collections={props.data.collections} />
-      <Grid
-        style={{ padding: "64px 24px" }}
-        container
-        spacing={{ xs: 1, sm: 2, md: 2, lg: 1.5, xl: 2 }}
-        columns={{ xs: 4, sm: 8, md: 8, lg: 10, xl: 12 }}
-      >
-        {defaultCollection?.gallery?.map((artwork) => (
-          <ArtPreview
-            data={{
-              ...artwork,
-              artistId: defaultCollection.artistId,
-              collectionId: defaultCollection.id,
-            }}
-            key={artwork.id}
-          />
-        ))}
-      </Grid>
+      <ArtistProfile artist={artist} collections={collections} />
     </Layout>
   );
 };
