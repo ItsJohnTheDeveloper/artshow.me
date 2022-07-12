@@ -1,8 +1,14 @@
+import { useEffect, useState } from "react";
+import { GetServerSideProps } from "next";
 import styled from "@emotion/styled";
+import axios from "axios";
+import { useRouter } from "next/router";
 import { Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import Layout from "../../../../components/Layout";
 import Spacer from "../../../../components/Spacer";
 import ArtPreview from "../../../../components/Collection/Gallery/ArtPreview";
+import prisma from "../../../../lib/prisma";
+import GalleryGrid from "../../../../components/Collection/Gallery/GalleryGrid";
 
 const StyledArtPaper = styled(Paper)({
   backgroundColor: "#303339",
@@ -11,48 +17,69 @@ const StyledArtPaper = styled(Paper)({
   borderRadius: 10,
 });
 
-export const getServerSideProps = async ({ params, query }) => {
-  const { id } = params;
-  const { artId } = query;
-  console.log(artId);
+export const getServerSideProps: GetServerSideProps = async ({
+  params,
+  query,
+}) => {
+  const { artId } = query as any;
 
-  const data = await import("../../../../mock/mock-data.json");
-
-  const galleryByCollection = data?.collections.filter(
-    (collection) => collection.id === id
-  )[0];
-
-  const artByGallery = galleryByCollection.gallery.filter(
-    (art) => art.id === artId
-  )[0];
+  const painting = await prisma.painting.findUnique({
+    where: { id: artId },
+  });
 
   return {
-    props: { data: { art: artByGallery, collection: galleryByCollection } },
+    props: {
+      data: {
+        painting: JSON.stringify(painting),
+      },
+    },
   };
 };
 
 const Collection = (props) => {
-  const { description, images, price, size, title } = props.data.art;
-  const { gallery, id: collectionId, artistId } = props.data.collection;
+  const router = useRouter();
+  const painting = JSON.parse(props.data.painting);
+  const { description, width, height, image, name, price } = painting;
 
-  console.log(gallery);
+  const formattedSize = `w${width} x h${height}`;
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
+
+  const [collectionGallery, setCollectionGallery] = useState(null);
+
+  const collectionName = router.query.id;
+
+  useEffect(() => {
+    const getInitialCollection = async () => {
+      try {
+        const { data } = await axios.get("/collection/getCollections", {
+          params: { id: painting.collectionId },
+        });
+        setCollectionGallery(data);
+      } catch (err) {
+        console.error(err?.response);
+      }
+    };
+
+    if (!collectionGallery?.length) {
+      getInitialCollection();
+    }
+  }, [painting, collectionGallery]);
 
   return (
     <Layout pageSpacing showCrumbs>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={6} lg={6} xl={7}>
-          <img src={images[0]} style={{ width: "100%" }} />
+          <img src={image} style={{ width: "100%" }} />
         </Grid>
 
         <Grid item xs={12} sm={6} md={6} lg={6} xl={5}>
           <StyledArtPaper>
-            <Typography variant="h3">{title}</Typography>
+            <Typography variant="h3">{name}</Typography>
             <Spacer y={0.5} />
             <Typography variant="body1">{description}</Typography>
             <Spacer y={0.5} />
             <span style={{ color: "#999999", fontSize: 13, paddingTop: 3 }}>
-              Size: {size}
+              Size: {formattedSize}
             </span>
             <Spacer y={2} />
             <Typography variant="h4">${priceFormatted}</Typography>
@@ -69,25 +96,17 @@ const Collection = (props) => {
       <Spacer y={4} />
 
       <Typography variant="h4">
-        More from collection / {collectionId}
+        More from collection / {collectionName}
       </Typography>
-      <Grid
-        style={{ padding: "64px 24px" }}
-        container
-        spacing={{ xs: 1, sm: 2, md: 2, lg: 1.5, xl: 2 }}
-        columns={{ xs: 4, sm: 8, md: 8, lg: 10, xl: 12 }}
-      >
-        {gallery?.map((artwork) => (
+      <GalleryGrid xl={6}>
+        {collectionGallery?.map((painting) => (
           <ArtPreview
-            data={{
-              ...artwork,
-              artistId,
-              collectionId,
-            }}
-            key={artwork.id}
+            data={painting}
+            key={painting.id}
+            collectionName={collectionName}
           />
         ))}
-      </Grid>
+      </GalleryGrid>
     </Layout>
   );
 };

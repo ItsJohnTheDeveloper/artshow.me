@@ -2,16 +2,15 @@ import { useState } from "react";
 import { Chip, Menu, MenuItem } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useUser } from "../../contexts/user-context";
-import EditCollectionDialog from "../Modal/EditCollectionDialog";
 
 const CollectionList = ({
   artist,
   collections,
   selectedCollection,
   setSelectedCollection,
+  openEditDialog,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const { getUser: loggedInUser } = useUser();
   const isMyProfile = loggedInUser && loggedInUser.id === artist?.id;
@@ -82,16 +81,17 @@ const CollectionList = ({
                   <MenuItem
                     onClick={() => {
                       setMenuOpen(false);
-                      setCollection(collection.name, collection.id);
+                      if (collection.id !== selectedCollection.id) {
+                        setCollection(collection.name, collection.id);
+                      }
                     }}
                   >
                     View
                   </MenuItem>
-                  {/* edit collection dialog opener */}
                   <MenuItem
                     onClick={() => {
                       setCollection(collection.name, collection.id);
-                      setEditDialogOpen(true);
+                      openEditDialog();
                       setMenuOpen(false);
                     }}
                   >
@@ -103,11 +103,6 @@ const CollectionList = ({
           );
         })}
       </div>
-      <EditCollectionDialog
-        selectedCollection={selectedCollection}
-        open={editDialogOpen}
-        setOpen={setEditDialogOpen}
-      />
     </>
   );
 };

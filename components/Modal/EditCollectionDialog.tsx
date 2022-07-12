@@ -35,7 +35,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     error,
   } = useCollections(selectedCollection, artistId);
 
-  const [paintings, setPaintings] = useState([]);
+  const [paintings, setPaintings] = useState(collectionGallery);
 
   const [editMode, setEditMode] = useState("");
   const [addingNewPainting, setAddingNewPainting] = useState(false);
@@ -93,6 +93,20 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     setPaintings(items);
   };
 
+  const handleOnCollectionSave = async () => {
+    const orderOfPaintings = paintings.map((painting) => painting.id);
+
+    try {
+      await axios.patch("/collection/updateCollectionOrder", {
+        id: selectedCollection.id,
+        order: orderOfPaintings,
+      });
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <Dialog
       fullWidth
@@ -109,168 +123,179 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
       maxWidth={"md"}
       open={open}
     >
-      <DialogTitle>{`Edit ${selectedCollection?.name}`}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Here you can add, edit, remove, or change the order of your painting
-          by dragging and dropping them.
-        </DialogContentText>
-        {isLoadingPaintings && (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <CircularProgress color="success" />
-          </div>
-        )}
-        <List component="div">
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="droppable">
-              {(provided, snapshot) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {paintings?.map((painting, index) => {
-                    const isEditing = painting.id === editMode;
+      {isLoadingPaintings ? (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <CircularProgress color="success" />
+        </div>
+      ) : (
+        <>
+          <DialogTitle>{`Edit ${selectedCollection?.name}`}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Here you can add, edit, remove, or change the order of your
+              painting by dragging and dropping them.
+            </DialogContentText>
+            <List component="div">
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(provided, snapshot) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {paintings?.map((painting, index) => {
+                        const isEditing = painting.id === editMode;
 
-                    if (isEditing) {
-                      return (
-                        <ListItem>
-                          <img src={painting.image} height={128} width={128} />
-                          <Spacer x={2} />
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                            }}
+                        if (isEditing) {
+                          return (
+                            <ListItem>
+                              <img
+                                src={painting.image}
+                                height={128}
+                                width={128}
+                              />
+                              <Spacer x={2} />
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                }}
+                              >
+                                <TextField
+                                  id="outlined-title"
+                                  label="Title"
+                                  value={painting.title}
+                                  onChange={() => {}}
+                                />
+                                <Spacer y={1} />
+                                <TextField
+                                  id="outlined-description"
+                                  label="Description"
+                                  value={painting.description}
+                                  onChange={() => {}}
+                                />
+                              </div>
+                              <div style={{ right: 0, position: "absolute" }}>
+                                <Button
+                                  onClick={() => setEditMode(painting.id)}
+                                >
+                                  save
+                                </Button>
+                                <Button onClick={() => setEditMode("")}>
+                                  cancel
+                                </Button>
+                              </div>
+                            </ListItem>
+                          );
+                        }
+                        return (
+                          <Draggable
+                            key={painting.id}
+                            draggableId={painting.id}
+                            index={index}
                           >
-                            <TextField
-                              id="outlined-title"
-                              label="Title"
-                              value={painting.title}
-                              onChange={() => {}}
-                            />
-                            <Spacer y={1} />
-                            <TextField
-                              id="outlined-description"
-                              label="Description"
-                              value={painting.description}
-                              onChange={() => {}}
-                            />
-                          </div>
-                          <div style={{ right: 0, position: "absolute" }}>
-                            <Button onClick={() => setEditMode(painting.id)}>
-                              save
-                            </Button>
-                            <Button onClick={() => setEditMode("")}>
-                              cancel
-                            </Button>
-                          </div>
-                        </ListItem>
-                      );
-                    }
-                    return (
-                      <Draggable
-                        key={painting.id}
-                        draggableId={painting.id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <ListItem
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <img
-                              src={painting.image}
-                              height={128}
-                              width={128}
-                            />
-                            <Spacer x={2} />
-                            <ListItemText
-                              primary={painting.title}
-                              secondary={painting.description}
-                            />
-                            <Button onClick={() => setEditMode(painting.id)}>
-                              edit
-                            </Button>
-                          </ListItem>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-          {addingNewPainting ? (
-            <ListItem>
-              {newPainting?.image ? (
-                <img src={newPainting?.image} height={128} width={128} />
+                            {(provided, snapshot) => (
+                              <ListItem
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <img
+                                  src={painting.image}
+                                  height={128}
+                                  width={128}
+                                />
+                                <Spacer x={2} />
+                                <ListItemText
+                                  primary={painting.title}
+                                  secondary={painting.description}
+                                />
+                                <Button
+                                  onClick={() => setEditMode(painting.id)}
+                                >
+                                  edit
+                                </Button>
+                              </ListItem>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+              {addingNewPainting ? (
+                <ListItem>
+                  {newPainting?.image ? (
+                    <img src={newPainting?.image} height={128} width={128} />
+                  ) : (
+                    <Button
+                      onClick={() =>
+                        setNewPainting({
+                          ...newPainting,
+                          image: getRandomImage(),
+                        })
+                      }
+                    >
+                      Add image
+                    </Button>
+                  )}
+
+                  <Spacer x={2} />
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <TextField
+                      id="outlined-name"
+                      label="Name"
+                      value={newPainting?.name}
+                      onChange={(e) =>
+                        setNewPainting({ ...newPainting, name: e.target.value })
+                      }
+                    />
+                    <Spacer y={1} />
+                    <TextField
+                      id="outlined-description"
+                      label="Description"
+                      value={newPainting?.description}
+                      onChange={(e) =>
+                        setNewPainting({
+                          ...newPainting,
+                          description: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div style={{ right: 0, position: "absolute" }}>
+                    <Button onClick={handleOnNewPaintingCreate}>save</Button>
+                    <Button
+                      onClick={() => {
+                        setEditMode("");
+                        setNewPainting({});
+                        setAddingNewPainting(false);
+                      }}
+                    >
+                      cancel
+                    </Button>
+                  </div>
+                </ListItem>
               ) : (
-                <Button
-                  onClick={() =>
-                    setNewPainting({
-                      ...newPainting,
-                      image: getRandomImage(),
-                    })
-                  }
-                >
-                  Add image
-                </Button>
+                <ListItemButton onClick={() => setAddingNewPainting(true)}>
+                  <ListItemIcon>
+                    <Add />
+                  </ListItemIcon>
+                  <ListItemText primary="Add new" />
+                </ListItemButton>
               )}
-
-              <Spacer x={2} />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <TextField
-                  id="outlined-name"
-                  label="Name"
-                  value={newPainting?.name}
-                  onChange={(e) =>
-                    setNewPainting({ ...newPainting, name: e.target.value })
-                  }
-                />
-                <Spacer y={1} />
-                <TextField
-                  id="outlined-description"
-                  label="Description"
-                  value={newPainting?.description}
-                  onChange={(e) =>
-                    setNewPainting({
-                      ...newPainting,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div style={{ right: 0, position: "absolute" }}>
-                <Button onClick={handleOnNewPaintingCreate}>save</Button>
-                <Button
-                  onClick={() => {
-                    setEditMode("");
-                    setNewPainting({});
-                    setAddingNewPainting(false);
-                  }}
-                >
-                  cancel
-                </Button>
-              </div>
-            </ListItem>
-          ) : (
-            <ListItemButton onClick={() => setAddingNewPainting(true)}>
-              <ListItemIcon>
-                <Add />
-              </ListItemIcon>
-              <ListItemText primary="Add new" />
-            </ListItemButton>
-          )}
-        </List>
-      </DialogContent>
-      <DialogActions style={{ borderTop: "1px solid #14171c" }}>
-        <Button onClick={() => setOpen(false)}>Cancel</Button>
-        <Button onClick={() => {}}>Save</Button>
-      </DialogActions>
+            </List>
+          </DialogContent>
+          <DialogActions style={{ borderTop: "1px solid #14171c" }}>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={handleOnCollectionSave}>Save</Button>
+          </DialogActions>
+        </>
+      )}
     </Dialog>
   );
 };

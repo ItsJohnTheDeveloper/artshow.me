@@ -6,6 +6,7 @@ const useCollections = (selectedCollection, artistId) => {
   const [collectionGallery, setCollectionGallery] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isUpdatingData, setIsUpdatingData] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -29,11 +30,16 @@ const useCollections = (selectedCollection, artistId) => {
         setError("an error occured");
         setIsLoading(false);
       }
+      setIsUpdatingData(false);
     };
     getData();
-  }, [selectedCollection]);
+  }, [selectedCollection, isUpdatingData]);
 
-  return { collectionGallery, isLoading, error };
+  const updateData = () => {
+    setIsUpdatingData(true);
+  };
+
+  return { collectionGallery, isLoading, error, updateCollection: updateData };
 };
 
 export default useCollections;

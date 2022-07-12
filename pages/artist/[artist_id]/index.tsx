@@ -1,8 +1,6 @@
 import React from "react";
 import Layout from "../../../components/Layout";
-import ArtistProfile from "../../../components/Profile/Artist";
-import ArtPreview from "../../../components/Collection/Gallery/ArtPreview";
-import { Grid } from "@mui/material";
+import ArtistPage from "../../../components/Profile/Artist";
 import prisma from "../../../lib/prisma";
 import { ArtistDocument } from "../../../models/Artist";
 import { CollectionDocument } from "../../../models/Collection";
@@ -34,11 +32,11 @@ export const getServerSideProps = async ({ params }) => {
 };
 
 const Artist = (props) => {
-  const { artist, collections, mockCollections } = props.data;
+  const { artist, collections } = props.data;
 
   return (
     <Layout showCrumbs>
-      <ArtistProfile artist={artist} collections={collections} />
+      <ArtistPage artist={artist} collections={collections} />
     </Layout>
   );
 };

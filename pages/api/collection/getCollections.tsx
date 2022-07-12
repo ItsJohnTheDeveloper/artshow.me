@@ -9,11 +9,20 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
+      const collection = await prisma.collection.findUnique({
+        where: { id: collectionId },
+      });
+
       const response = await prisma.painting.findMany({
         where: { collectionId },
       });
 
-      res.status(200).json(response);
+      const order = collection.order;
+      const sorted = response.sort(
+        (a, b) => order.indexOf(a.id) - order.indexOf(b.id)
+      );
+
+      res.status(200).json(sorted);
       console.log(
         `Paintings in collection: ${collectionId} successfully FETCHED`
       );
