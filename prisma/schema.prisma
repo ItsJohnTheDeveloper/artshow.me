@@ -10,46 +10,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  content   String?
-  published Boolean @default(false)
-  // author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
-}
-
-// model Account {
-//   id  String  @id @default(auto()) @map("_id") @db.ObjectId
-//   userId             String  @map("user_id")
-//   type               String
-//   provider           String
-//   providerAccountId  String  @map("provider_account_id")
-//   refresh_token      String?    @db.String
-//   access_token       String?    @db.String
-//   id_token           String?    @db.String
-//   expires_at         Int?
-//   token_type         String?
-//   scope              String?
-//   session_state      String?
-//   oauth_token_secret String?
-//   oauth_token        String?
-
-//   // user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-//   @@unique([provider, providerAccountId])
-//   @@map("accounts")
-// }
-
-model Session {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique @map("session_token")
-  userId       String   @map("user_id")
-  expires      DateTime
-  // user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
 
 model User {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
@@ -69,7 +29,7 @@ model Collection {
   name      String   @unique
   userId    String   @unique @db.ObjectId
   published Boolean @default(false)
-  paintings Painting[]  
+  paintings String[] 
   order     String[] @unique @db.ObjectId
 }
 
@@ -85,7 +45,7 @@ model Painting {
   description String?
   userId   String   @unique @db.ObjectId
   collectionId String   @unique @db.ObjectId
-  collection Collection @relation(fields: [collectionId], references: [id])
+  // collection Collection @relation(fields: [collectionId], references: [id])
 }
 
 
