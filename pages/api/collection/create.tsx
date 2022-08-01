@@ -11,7 +11,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
       const response = await prisma.collection.create({
-        data: { name, userId },
+        data: { name, userId, paintings: [] },
       });
 
       res.status(200).json(response);

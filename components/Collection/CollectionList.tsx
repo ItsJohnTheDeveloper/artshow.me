@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Chip, Menu, MenuItem } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useUser } from "../../contexts/user-context";
@@ -54,7 +54,7 @@ const CollectionList = ({
           const [menuOpen, setMenuOpen] = useState(false);
 
           return (
-            <>
+            <React.Fragment key={collection.id}>
               <Chip
                 key={i}
                 label={collection.name}
@@ -99,7 +99,7 @@ const CollectionList = ({
                   </MenuItem>
                 </Menu>
               )}
-            </>
+            </React.Fragment>
           );
         })}
       </div>

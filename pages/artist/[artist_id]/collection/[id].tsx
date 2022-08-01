@@ -15,6 +15,8 @@ const StyledArtPaper = styled(Paper)({
   padding: 20,
   marginBottom: 10,
   borderRadius: 10,
+  position: "sticky",
+  top: 24,
 });
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -39,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 const Collection = (props) => {
   const router = useRouter();
   const painting = JSON.parse(props.data.painting);
-  const { description, width, height, image, name, price } = painting;
+  const { description, width, height, image, name, price, id } = painting;
 
   const formattedSize = `w${width} x h${height}`;
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
@@ -95,17 +97,23 @@ const Collection = (props) => {
       <Divider />
       <Spacer y={4} />
 
-      <Typography variant="h4">
-        More from collection / {collectionName}
+      <Typography variant="body1">
+        More from
+        <Typography variant="h4" fontStyle={"italic"}>
+          {collectionName}
+        </Typography>
       </Typography>
       <GalleryGrid xl={6}>
-        {collectionGallery?.map((painting) => (
-          <ArtPreview
-            data={painting}
-            key={painting.id}
-            collectionName={collectionName}
-          />
-        ))}
+        {collectionGallery?.map(
+          (painting) =>
+            id !== painting.id && ( //don't show the current selected painting in collection
+              <ArtPreview
+                data={painting}
+                key={painting.id}
+                collectionName={collectionName}
+              />
+            )
+        )}
       </GalleryGrid>
     </Layout>
   );

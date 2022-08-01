@@ -10,11 +10,21 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
     const data = { data: req.body };
 
     try {
-      const response = await prisma.painting.create(data);
+      const paintingRes = await prisma.painting.create(data);
 
-      res.status(200).json(response);
+      // once painting is created, add it to the collection.
+      await prisma.collection.update({
+        where: { id: paintingRes.collectionId },
+        data: {
+          paintings: {
+            push: paintingRes.id,
+          },
+        },
+      });
+
+      res.status(200).json(paintingRes);
       console.log(
-        `Painting successfully added to Collection: ${response.collectionId}`
+        `Painting successfully added to Collection: ${paintingRes.collectionId}`
       );
     } catch (err) {
       console.log(err);

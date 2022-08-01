@@ -19,7 +19,7 @@ const StyledBreadCrumbs = () => {
   };
 
   return (
-    <div style={{ padding: "32px 12px" }}>
+    <div style={{ padding: "32px 12px", fontSize: 21 }}>
       <Link href={links.home}>
         <a
           style={{
@@ -27,7 +27,7 @@ const StyledBreadCrumbs = () => {
             color: "#a7a7ff",
           }}
         >
-          Home
+          Home{" "}
         </a>
       </Link>
       {url.includes(links.artist) && !url.includes("collection")
@@ -35,7 +35,6 @@ const StyledBreadCrumbs = () => {
         : links.artist && (
             <Link href={links.artist}>
               <a style={{ textDecoration: "auto", color: "#a7a7ff" }}>
-                {" "}
                 / Artist
               </a>
             </Link>

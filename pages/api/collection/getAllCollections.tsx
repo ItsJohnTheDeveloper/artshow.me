@@ -24,6 +24,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
           const moddedCollection = {
             collectionName: collection.name,
             paintings: paintingsInCollection,
+            size: collection.paintings.length,
           };
           return moddedCollection;
         })
