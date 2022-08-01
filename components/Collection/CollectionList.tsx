@@ -36,8 +36,9 @@ const CollectionList = ({
           display: "flex",
           overflow: "auto",
           gap: 6,
-          margin: "24px 0px 24px 24px",
+          margin: "24px 0px 24px 0px",
           paddingBottom: 12,
+          paddingLeft: 24,
         }}
       >
         <Chip

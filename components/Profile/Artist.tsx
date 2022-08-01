@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Collapse, TextField, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { styled } from "@mui/system";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { Add } from "@mui/icons-material";
+import { Add, AddAPhoto } from "@mui/icons-material";
 import Spacer from "../Spacer";
 import { useUser } from "../../contexts/user-context";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
@@ -16,6 +16,7 @@ import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import useCollections from "../../utils/hooks/useCollections";
 import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
+import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -68,6 +69,9 @@ const Artist = ({ artist, collections }: ArtistProps) => {
   const [selectedCollection, setSelectedCollection] = useState(showAllOption);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
+  const hiddenFileInputRef = useRef(null);
+  const [uploadedProfilePic, setUploadedProfilePic] = useState(null);
+
   const [createCollectionDialogOpen, setCreateCollectionDialogOpen] =
     useState(false);
 
@@ -83,6 +87,9 @@ const Artist = ({ artist, collections }: ArtistProps) => {
     updateCollection();
   }, [editDialogOpen]);
 
+  const collectionIsEmpty =
+    !collectionGallery.length && !isLoadingCollectionGallery;
+
   const {
     register,
     handleSubmit,
@@ -94,6 +101,9 @@ const Artist = ({ artist, collections }: ArtistProps) => {
   const isMyProfile = loggedInUser && loggedInUser.id === artist?.id;
 
   const onEditProfileSubmit = async (data) => {
+    if (uploadedProfilePic) {
+      data.profilePic = uploadedProfilePic;
+    }
     try {
       const res = await fetch(`/api/users/${artist.id}`, {
         method: "PATCH",
@@ -115,14 +125,15 @@ const Artist = ({ artist, collections }: ArtistProps) => {
   const handleCreateCollectionSubmit = async (data) => {
     const newCollectionData = { ...data, userId: artist.id };
     try {
-      const res = await axios.post("/collection/create", newCollectionData);
+      await axios.post("/collection/create", newCollectionData, {
+        headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
+      });
       setCreateCollectionDialogOpen(false);
     } catch (err) {
+      // TODO: handle error later
       console.error(err);
     }
   };
-
-  console.log({ selectedCollection });
 
   const showAllCollections =
     selectedCollection.id === showAllOption.id && !isLoadingCollectionGallery;
@@ -142,11 +153,50 @@ const Artist = ({ artist, collections }: ArtistProps) => {
         <StyledCoverWrapper>
           <StyledCoverImage src={artist.coverPic} />
         </StyledCoverWrapper>
-        <StyledAvatar
-          alt="profilename"
-          src={artist.profilePic}
-          sx={{ width: 128, height: 128 }}
-        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <StyledAvatar
+            alt="profilename"
+            src={uploadedProfilePic || artist.profilePic}
+            sx={{ width: 128, height: 128 }}
+          />
+          {inEditMode && (
+            <>
+              <AddAPhoto
+                style={{
+                  position: "relative",
+                  bottom: 27,
+                  right: -43,
+                  marginBottom: -10,
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  hiddenFileInputRef.current.click();
+                }}
+              />
+              <input
+                type={"file"}
+                ref={hiddenFileInputRef}
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  handleUploadProfilePicture(
+                    file,
+                    loggedInUser.id,
+                    (url: string) => {
+                      setUploadedProfilePic(url);
+                    }
+                  );
+                }}
+              />
+            </>
+          )}
+        </div>
         <StyledProfileWrapper>
           {isMyProfile && !inEditMode && (
             <div style={{ display: "flex" }}>
@@ -175,10 +225,11 @@ const Artist = ({ artist, collections }: ArtistProps) => {
                     {"cancel"}
                   </Button>
                 </>
+                <Spacer y={1} />
                 <TextField
                   fullWidth
                   label="Name"
-                  variant="filled"
+                  variant="outlined"
                   defaultValue={artist.name}
                   {...register("name", { required: true })}
                 />
@@ -244,12 +295,19 @@ const Artist = ({ artist, collections }: ArtistProps) => {
         openEditDialog={() => setEditDialogOpen(true)}
       />
 
+      {collectionIsEmpty && (
+        <Typography variant="h5" marginLeft={3}>
+          This collection is empty
+        </Typography>
+      )}
+
       {showAllCollections &&
         collectionGallery?.map(
           (collection) =>
+            collection.size > 0 &&
             collection && (
               <>
-                <Typography variant="h4" marginLeft={3}>
+                <Typography variant="h4" marginLeft={3} fontStyle={"italic"}>
                   {collection.collectionName}
                 </Typography>
 
@@ -277,6 +335,7 @@ const Artist = ({ artist, collections }: ArtistProps) => {
           ))}
         </GalleryGrid>
       )}
+
       <Spacer y={isLoadingCollectionGallery ? 80 : 50} />
 
       <EditCollectionDialog

@@ -8,13 +8,15 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const userId = req.query.id as string;
-    const { name } = req.body;
+    const { name, bio, profilePic } = req.body;
 
     try {
       const response = await prisma.user.update({
         where: { id: userId },
         data: {
           name,
+          bio,
+          profilePic,
         },
       });
 

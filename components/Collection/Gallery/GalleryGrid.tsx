@@ -8,7 +8,7 @@ const GalleryGrid = ({ children, xl }: GalleryGridProps) => {
   return (
     <Grid
       style={{
-        padding: "64px 24px",
+        padding: "42px 24px",
       }}
       container
       spacing={{ xs: 1, sm: 2, md: 2, lg: 1.5, xl: 2 }}

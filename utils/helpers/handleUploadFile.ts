@@ -13,7 +13,7 @@ export const handleUploadProfilePicture = async (file, userId, callback) => {
     await axios.put(url, file, {
       headers: {
         "Content-Type": file.type,
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "*", // TODO: Change this later
       },
     });
 
@@ -37,7 +37,7 @@ export const handleUploadPaintingPicture = async (file, userId, callback) => {
     await axios.put(url, file, {
       headers: {
         "Content-Type": file.type,
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "*", // TODO: Change this later
       },
     });
 

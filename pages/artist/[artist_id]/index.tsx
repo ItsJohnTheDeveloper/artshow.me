@@ -23,6 +23,8 @@ export const getServerSideProps = async ({ params }) => {
           ...mockData.artist,
           id: params?.artist_id,
           name: artist.name,
+          bio: artist.bio,
+          profilePic: artist.profilePic,
         },
         mockCollections: mockData.collections,
         collections,
