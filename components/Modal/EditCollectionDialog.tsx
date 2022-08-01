@@ -13,15 +13,16 @@ import {
   ListItemIcon,
   ListItemText,
   TextField,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useUser } from "../../contexts/user-context";
 import useCollections from "../../utils/hooks/useCollections";
-import { getRandomImage } from "../../utils/helpers/getRandomImage";
 import Spacer from "../Spacer";
+import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 
 const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
   const router = useRouter();
@@ -37,9 +38,12 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
 
   const [paintings, setPaintings] = useState(collectionGallery);
 
+  const hiddenFileInputRef = useRef(null);
   const [editMode, setEditMode] = useState("");
   const [addingNewPainting, setAddingNewPainting] = useState(false);
   const [newPainting, setNewPainting] = useState(null);
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
   useEffect(() => {
     if (!isLoadingPaintings && !error) {
@@ -57,7 +61,11 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     };
 
     try {
-      const response = await axios.post("/painting/create", fullPaintingObject);
+      const response = await axios.post(
+        "/painting/create",
+        fullPaintingObject,
+        { headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` } }
+      );
 
       // once the painting is created, add it to the collection
       setPaintings([...paintings, response.data]);
@@ -97,9 +105,25 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     const orderOfPaintings = paintings.map((painting) => painting.id);
 
     try {
-      await axios.patch("/collection/updateCollectionOrder", {
-        id: selectedCollection.id,
-        order: orderOfPaintings,
+      await axios.patch(
+        "/collection/updateCollectionOrder",
+        {
+          id: selectedCollection.id,
+          order: orderOfPaintings,
+        },
+        { headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` } }
+      );
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOnCollectionDelete = async () => {
+    try {
+      await axios.delete("/collection/delete", {
+        data: { id: selectedCollection.id },
+        headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
       });
       setOpen(false);
     } catch (err) {
@@ -129,7 +153,14 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
         </div>
       ) : (
         <>
-          <DialogTitle>{`Edit ${selectedCollection?.name}`}</DialogTitle>
+          <DialogTitle>
+            <Typography variant="body1">
+              Edit
+              <Typography variant="h4" fontStyle={"italic"}>
+                {selectedCollection?.name}
+              </Typography>
+            </Typography>
+          </DialogTitle>
           <DialogContent>
             <DialogContentText>
               Here you can add, edit, remove, or change the order of your
@@ -161,7 +192,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                                 <TextField
                                   id="outlined-title"
                                   label="Title"
-                                  value={painting.title}
+                                  value={painting.name}
                                   onChange={() => {}}
                                 />
                                 <Spacer y={1} />
@@ -204,7 +235,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                                 />
                                 <Spacer x={2} />
                                 <ListItemText
-                                  primary={painting.title}
+                                  primary={painting.name}
                                   secondary={painting.description}
                                 />
                                 <Button
@@ -227,16 +258,33 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                   {newPainting?.image ? (
                     <img src={newPainting?.image} height={128} width={128} />
                   ) : (
-                    <Button
-                      onClick={() =>
-                        setNewPainting({
-                          ...newPainting,
-                          image: getRandomImage(),
-                        })
-                      }
-                    >
-                      Add image
-                    </Button>
+                    <>
+                      <Button
+                        onClick={() => {
+                          hiddenFileInputRef.current.click();
+                        }}
+                      >
+                        Add image
+                      </Button>
+                      <input
+                        type={"file"}
+                        ref={hiddenFileInputRef}
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          handleUploadPaintingPicture(
+                            file,
+                            loggedInUser.id,
+                            (url: string) => {
+                              setNewPainting({
+                                ...newPainting,
+                                image: url,
+                              });
+                            }
+                          );
+                        }}
+                      />
+                    </>
                   )}
 
                   <Spacer x={2} />
@@ -291,11 +339,54 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
             </List>
           </DialogContent>
           <DialogActions style={{ borderTop: "1px solid #14171c" }}>
+            <div style={{ width: "100%" }}>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => setDeleteConfirmation(true)}
+              >
+                Delete Collection
+              </Button>
+            </div>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
             <Button onClick={handleOnCollectionSave}>Save</Button>
           </DialogActions>
         </>
       )}
+
+      {/* Delete collection confirmation Dialog. */}
+      <Dialog
+        fullWidth
+        PaperProps={{
+          style: {
+            maxHeight: "100vh",
+            margin: 0,
+            backgroundColor: "#212730",
+            boxShadow: "24px",
+            borderRadius: 12,
+            backgroundImage: "unset",
+          },
+        }}
+        maxWidth={"md"}
+        open={deleteConfirmation}
+      >
+        <DialogTitle>Delete Collection</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {`Your about to delete '${selectedCollection?.name}', are you sure?`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmation(false)}>Cancel</Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleOnCollectionDelete}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

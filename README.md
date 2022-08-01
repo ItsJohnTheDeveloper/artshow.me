@@ -6,18 +6,6 @@ This is the starter project for the fullstack tutorial with Next.js and Prisma. 
 
 `npm run dev`
 
-# Configure .env file
-
-You'll need to connect your db of choice. I'm using PostgreSQL hosted on Heroku
-
-> DATABASE_URL="postgres://{url}"
-
-> GITHUB_ID={id}
-
-> GITHUB_SECRET={secret}
-
-> NEXTAUTH_URL=http://localhost:3000/api/auth
-
 # Prisma cmds
 
 ### Installing Prisma CLI
