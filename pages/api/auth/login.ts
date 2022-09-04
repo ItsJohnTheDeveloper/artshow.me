@@ -45,7 +45,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       console.log(`User id: (${existingUser.email}) successfully logged in.`);
       res.status(200).json({ id: existingUser.id, accessToken, refreshToken });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });
     }
   } else {

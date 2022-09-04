@@ -49,12 +49,13 @@ const Collection = (props) => {
   const [collectionGallery, setCollectionGallery] = useState(null);
 
   const collectionName = router.query.id;
+  const collectionId = painting?.collectionIds?.[0];
 
   useEffect(() => {
     const getInitialCollection = async () => {
       try {
         const { data } = await axios.get("/collection/getCollections", {
-          params: { id: painting.collectionId },
+          params: { id: collectionId },
         });
         setCollectionGallery(data);
       } catch (err) {

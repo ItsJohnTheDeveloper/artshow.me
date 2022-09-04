@@ -3,7 +3,7 @@ import prisma from "../../../lib/prisma";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
-    const { userId } = req.query as any;
+    const { userId, limited } = req.query as any;
 
     if (!userId) {
       res.status(404).json("404 - No user id found");
@@ -14,11 +14,17 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         where: { userId },
       });
 
+      if (limited) {
+        return Promise.resolve(collectionsRes).then((result) => {
+          res.status(200).json(result);
+        });
+      }
+
       const listPromise = await Promise.all(
         collectionsRes.map(async (collection) => {
           const paintingsInCollection = await prisma.painting.findMany({
-            where: { collectionId: collection.id },
-            take: 3,
+            where: { collectionIds: { has: collection.id } },
+            // take: 3,
           });
 
           const moddedCollection = {
@@ -34,7 +40,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(200).json(result);
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });
     }
   } else {

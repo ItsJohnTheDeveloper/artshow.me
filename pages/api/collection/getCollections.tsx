@@ -14,7 +14,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       });
 
       const response = await prisma.painting.findMany({
-        where: { collectionId },
+        where: { collectionIds: { has: collectionId } },
       });
 
       const order = collection.order;
@@ -27,7 +27,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         `Paintings in collection: ${collectionId} successfully FETCHED`
       );
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });
     }
   } else {

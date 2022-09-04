@@ -56,7 +56,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
       ...newPainting,
       width: 123,
       height: 123,
-      collectionId: selectedCollection.id,
+      collectionIds: [selectedCollection.id],
       userId: loggedInUser.id,
     };
 

@@ -44,7 +44,7 @@ model Painting {
   price      Int?
   description String?
   userId   String   @unique @db.ObjectId
-  collectionId String   @unique @db.ObjectId
+  collectionIds String[]   @unique @db.ObjectId
   // collection Collection @relation(fields: [collectionId], references: [id])
 }
 

@@ -17,7 +17,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         .status(200)
         .json({ message: `Tokens revoked for user with id #${userId}` });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });
     }
   } else {

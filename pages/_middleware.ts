@@ -18,6 +18,7 @@ const isAuthenticated = (req: NextRequest) => {
     jwt.verify(token, process.env.JWT_ACCESS_SECRET);
   } catch (err) {
     if (err.name === "TokenExpiredError") {
+      // TODO: Refresh token logic (maybe log the user out or something)
       return new Response(JSON.stringify({ message: err.name }), {
         status: 401,
       });

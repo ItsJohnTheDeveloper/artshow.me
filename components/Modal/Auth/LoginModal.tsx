@@ -1,4 +1,11 @@
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import IconButton from "@mui/material/IconButton";
 import { Close } from "@mui/icons-material";
@@ -34,9 +41,10 @@ const LoginModal = ({ open, setOpen }) => {
   const { setUser } = useUser();
 
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const onLoginSubmit = async (data: LoginSubmitForm) => {
-    setError("");
+    setIsLoading(true);
     try {
       const response = await axios.post("/auth/login", data);
       console.log(response);
@@ -46,11 +54,13 @@ const LoginModal = ({ open, setOpen }) => {
 
       setOpen(false);
     } catch (err) {
+      setIsLoading(false);
       if (err?.response?.status === 403) {
         setError("Invalid login credentials.");
       }
-      console.log(err);
+      console.error(err);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -100,7 +110,11 @@ const LoginModal = ({ open, setOpen }) => {
           )}
           <Spacer y={2} />
           <Button variant="contained" type={"submit"}>
-            Login
+            {isLoading ? (
+              <CircularProgress color="success" size={20} />
+            ) : (
+              "Login"
+            )}
           </Button>
           {error && (
             <Typography variant="body1" color={"#c33333"}>

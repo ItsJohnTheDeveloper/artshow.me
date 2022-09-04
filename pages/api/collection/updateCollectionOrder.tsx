@@ -19,7 +19,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(200).json(response);
       console.log(`Collection ${id}, order PATCHED`);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });
     }
   } else {

@@ -14,9 +14,11 @@ import CollectionList from "../Collection/CollectionList";
 import ArtPreview from "../Collection/Gallery/ArtPreview";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import useCollections from "../../utils/hooks/useCollections";
+import useCollectionlessArtwork from "../../utils/hooks/useCollectionlessArtwork";
 import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
+import AddArtworkDialog from "../Modal/AddArtworkDialog";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -74,6 +76,7 @@ const Artist = ({ artist, collections }: ArtistProps) => {
 
   const [createCollectionDialogOpen, setCreateCollectionDialogOpen] =
     useState(false);
+  const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
   const {
     collectionGallery,
@@ -81,6 +84,12 @@ const Artist = ({ artist, collections }: ArtistProps) => {
     updateCollection,
     error,
   } = useCollections(selectedCollection, artist.id);
+
+  const {
+    collectionlessArtwork,
+    isLoading: isLoadingCollectionlessArtwork,
+    error: errorLoadingCollectionlessArtwork,
+  } = useCollectionlessArtwork(artist.id);
 
   useEffect(() => {
     // update the collection when the EditCollectionDialog closes
@@ -120,6 +129,10 @@ const Artist = ({ artist, collections }: ArtistProps) => {
 
   const onOpenCollectionCreateModal = () => {
     setCreateCollectionDialogOpen(true);
+  };
+
+  const onOpenAddArtworkModal = () => {
+    setAddArtworkDialogOpen(true);
   };
 
   const handleCreateCollectionSubmit = async (data) => {
@@ -263,27 +276,41 @@ const Artist = ({ artist, collections }: ArtistProps) => {
                     onClick={() => setBioOpen(!bioOpen)}
                   >
                     {bioOpen ? "Show less" : "Show more"}
+                    <Spacer y={4} />
                   </div>
                 )}
               </>
+              {isMyProfile && (
+                <>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<Add />}
+                      onClick={onOpenAddArtworkModal}
+                    >
+                      Add Artwork
+                    </Button>
+                    <Spacer x={2} />
+                    <Button
+                      variant="outlined"
+                      startIcon={<Add />}
+                      onClick={onOpenCollectionCreateModal}
+                    >
+                      New Collection
+                    </Button>
+                  </div>
+                  <AddArtworkDialog
+                    open={addArtworkDialogOpen}
+                    setOpen={setAddArtworkDialogOpen}
+                  />
+                  <CreateCollectionDialog
+                    open={createCollectionDialogOpen}
+                    setOpen={setCreateCollectionDialogOpen}
+                    handleOnSubmit={handleCreateCollectionSubmit}
+                  />
+                </>
+              )}
             </StyledProfileInfo>
-          )}
-          {isMyProfile && (
-            <>
-              <Spacer y={4} />
-              <Button
-                variant="outlined"
-                startIcon={<Add />}
-                onClick={onOpenCollectionCreateModal}
-              >
-                New Collection
-              </Button>
-              <CreateCollectionDialog
-                open={createCollectionDialogOpen}
-                setOpen={setCreateCollectionDialogOpen}
-                handleOnSubmit={handleCreateCollectionSubmit}
-              />
-            </>
           )}
         </StyledProfileWrapper>
       </div>
@@ -295,10 +322,27 @@ const Artist = ({ artist, collections }: ArtistProps) => {
         openEditDialog={() => setEditDialogOpen(true)}
       />
 
-      {collectionIsEmpty && (
+      {collectionIsEmpty && !showAllCollections && (
         <Typography variant="h5" marginLeft={3}>
           This collection is empty
         </Typography>
+      )}
+
+      {showAllCollections && collectionlessArtwork?.length && (
+        <>
+          <Typography variant="h4" marginLeft={3} fontStyle={"italic"}>
+            {"Individual Artwork"}
+          </Typography>
+          <GalleryGrid>
+            {collectionlessArtwork?.map((artwork) => (
+              <ArtPreview
+                data={artwork}
+                key={artwork.id}
+                collectionName={"my-work"}
+              />
+            ))}
+          </GalleryGrid>
+        </>
       )}
 
       {showAllCollections &&

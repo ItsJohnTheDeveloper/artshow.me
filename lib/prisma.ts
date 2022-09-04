@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === "production") {
     try {
       global.prisma = new PrismaClient();
     } catch (err) {
-      console.log(err);
+      console.error(err);
       console.log("Prisma Client can't run right now :(");
     }
   }

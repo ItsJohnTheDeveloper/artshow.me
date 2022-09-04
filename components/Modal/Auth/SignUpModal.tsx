@@ -41,7 +41,7 @@ const SignUpModal = ({ open, setOpen }) => {
       console.log(`Successfully created user: ${user.name}`);
       setOpen(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 

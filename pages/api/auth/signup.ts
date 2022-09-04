@@ -44,7 +44,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       console.log(`User: (${user.email}) successfully created`);
       res.status(200).json({ response, accessToken, refreshToken });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });
     }
   } else {
