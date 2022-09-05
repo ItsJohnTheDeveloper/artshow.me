@@ -24,31 +24,37 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
 }) => {
   const { artId } = query as any;
+  const { collection: collectionName, artist_id } = params as any;
 
   const painting = await prisma.painting.findUnique({
     where: { id: artId },
+  });
+
+  const collection = await prisma.collection.findUnique({
+    where: { name: collectionName, userId: artist_id },
   });
 
   return {
     props: {
       data: {
         painting: JSON.stringify(painting),
+        collection: JSON.stringify(collection),
       },
     },
   };
 };
 
 const Collection = (props) => {
-  const router = useRouter();
   const painting = JSON.parse(props.data.painting);
+  const collection = JSON.parse(props.data.collection);
+
   const { description, width, height, image, name, price, id } = painting;
 
   const formattedSize = `w${width} x h${height}`;
-  const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
+  const formattedPrice = new Intl.NumberFormat("en-CA").format(price);
 
   const [collectionGallery, setCollectionGallery] = useState(null);
 
-  const collectionName = router.query.id;
   const collectionId = painting?.collectionIds?.[0];
 
   useEffect(() => {
@@ -85,7 +91,7 @@ const Collection = (props) => {
               Size: {formattedSize}
             </span>
             <Spacer y={2} />
-            <Typography variant="h4">${priceFormatted}</Typography>
+            <Typography variant="h4">${formattedPrice}</Typography>
             <Spacer y={1} />
 
             <Button size="medium" variant="contained">
@@ -101,7 +107,7 @@ const Collection = (props) => {
       <Typography variant="body1">
         More from
         <Typography variant="h4" fontStyle={"italic"}>
-          {collectionName}
+          {collection.name}
         </Typography>
       </Typography>
       <GalleryGrid xl={6}>
@@ -109,9 +115,9 @@ const Collection = (props) => {
           (painting) =>
             id !== painting.id && ( //don't show the current selected painting in collection
               <ArtPreview
-                data={painting}
                 key={painting.id}
-                collectionName={collectionName}
+                data={painting}
+                collection={collection}
               />
             )
         )}

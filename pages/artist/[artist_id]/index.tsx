@@ -25,20 +25,19 @@ export const getServerSideProps = async ({ params }) => {
           name: artist.name,
           bio: artist.bio,
           profilePic: artist.profilePic,
+          collections,
         },
-        mockCollections: mockData.collections,
-        collections,
       },
     },
   };
 };
 
 const Artist = (props) => {
-  const { artist, collections } = props.data;
+  const { artist } = props.data;
 
   return (
     <Layout showCrumbs>
-      <ArtistPage artist={artist} collections={collections} />
+      <ArtistPage artist={artist} />
     </Layout>
   );
 };

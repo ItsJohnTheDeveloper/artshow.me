@@ -9,12 +9,10 @@ import Spacer from "../Spacer";
 import { useUser } from "../../contexts/user-context";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
 import { Artist } from "../../models/Artist";
-import { Collection } from "../../models/Collection";
 import CollectionList from "../Collection/CollectionList";
 import ArtPreview from "../Collection/Gallery/ArtPreview";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import useCollections from "../../utils/hooks/useCollections";
-import useCollectionlessArtwork from "../../utils/hooks/useCollectionlessArtwork";
+import useGallery from "../../utils/hooks/useGallery";
 import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
@@ -61,10 +59,9 @@ const StyledProfileInfo = styled("div")({
 
 interface ArtistProps {
   artist: Artist;
-  collections: Collection[];
 }
 
-const Artist = ({ artist, collections }: ArtistProps) => {
+const Artist = ({ artist }: ArtistProps) => {
   const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
@@ -79,25 +76,16 @@ const Artist = ({ artist, collections }: ArtistProps) => {
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
   const {
-    collectionGallery,
-    isLoading: isLoadingCollectionGallery,
-    updateCollection,
+    gallery,
+    isLoading: isLoadingGallery,
+    updateGallery,
     error,
-  } = useCollections(selectedCollection, artist.id);
-
-  const {
-    collectionlessArtwork,
-    isLoading: isLoadingCollectionlessArtwork,
-    error: errorLoadingCollectionlessArtwork,
-  } = useCollectionlessArtwork(artist.id);
+  } = useGallery(selectedCollection?.id, artist.id);
 
   useEffect(() => {
     // update the collection when the EditCollectionDialog closes
-    updateCollection();
+    updateGallery();
   }, [editDialogOpen]);
-
-  const collectionIsEmpty =
-    !collectionGallery.length && !isLoadingCollectionGallery;
 
   const {
     register,
@@ -147,12 +135,6 @@ const Artist = ({ artist, collections }: ArtistProps) => {
       console.error(err);
     }
   };
-
-  const showAllCollections =
-    selectedCollection.id === showAllOption.id && !isLoadingCollectionGallery;
-
-  const showSpecificCollection =
-    selectedCollection.id !== showAllOption.id && !isLoadingCollectionGallery;
 
   return (
     <div>
@@ -302,6 +284,7 @@ const Artist = ({ artist, collections }: ArtistProps) => {
                   <AddArtworkDialog
                     open={addArtworkDialogOpen}
                     setOpen={setAddArtworkDialogOpen}
+                    artist={artist}
                   />
                   <CreateCollectionDialog
                     open={createCollectionDialogOpen}
@@ -316,71 +299,30 @@ const Artist = ({ artist, collections }: ArtistProps) => {
       </div>
       <CollectionList
         artist={artist}
-        collections={collections}
         selectedCollection={selectedCollection}
         setSelectedCollection={setSelectedCollection}
         openEditDialog={() => setEditDialogOpen(true)}
       />
 
-      {collectionIsEmpty && !showAllCollections && (
+      {!gallery?.length && !isLoadingGallery && (
         <Typography variant="h5" marginLeft={3}>
           This collection is empty
         </Typography>
       )}
 
-      {showAllCollections && collectionlessArtwork?.length && (
-        <>
-          <Typography variant="h4" marginLeft={3} fontStyle={"italic"}>
-            {"Individual Artwork"}
-          </Typography>
-          <GalleryGrid>
-            {collectionlessArtwork?.map((artwork) => (
-              <ArtPreview
-                data={artwork}
-                key={artwork.id}
-                collectionName={"my-work"}
-              />
-            ))}
-          </GalleryGrid>
-        </>
-      )}
-
-      {showAllCollections &&
-        collectionGallery?.map(
-          (collection) =>
-            collection.size > 0 &&
-            collection && (
-              <>
-                <Typography variant="h4" marginLeft={3} fontStyle={"italic"}>
-                  {collection.collectionName}
-                </Typography>
-
-                <GalleryGrid>
-                  {collection?.paintings?.map((artwork, index) => (
-                    <ArtPreview
-                      data={artwork}
-                      key={artwork.id}
-                      collectionName={collection.collectionName}
-                    />
-                  ))}
-                </GalleryGrid>
-              </>
-            )
-        )}
-
-      {showSpecificCollection && (
+      {gallery?.length && !isLoadingGallery && (
         <GalleryGrid>
-          {collectionGallery?.map((painting) => (
+          {gallery?.map((artwork) => (
             <ArtPreview
-              data={painting}
-              key={painting.id}
-              collectionName={selectedCollection.name}
+              key={artwork.id}
+              data={artwork}
+              collection={selectedCollection}
             />
           ))}
         </GalleryGrid>
       )}
 
-      <Spacer y={isLoadingCollectionGallery ? 80 : 50} />
+      <Spacer y={isLoadingGallery ? 80 : 50} />
 
       <EditCollectionDialog
         selectedCollection={selectedCollection}

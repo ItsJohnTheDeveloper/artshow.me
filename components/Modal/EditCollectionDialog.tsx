@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useUser } from "../../contexts/user-context";
-import useCollections from "../../utils/hooks/useCollections";
+import useGallery from "../../utils/hooks/useGallery";
 import Spacer from "../Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 
@@ -31,12 +31,12 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
   const { getUser: loggedInUser } = useUser();
 
   const {
-    collectionGallery,
-    isLoading: isLoadingPaintings,
+    gallery,
+    isLoading: isLoadingGallery,
     error,
-  } = useCollections(selectedCollection, artistId);
+  } = useGallery(selectedCollection?.id, artistId);
 
-  const [paintings, setPaintings] = useState(collectionGallery);
+  const [paintings, setPaintings] = useState(gallery);
 
   const hiddenFileInputRef = useRef(null);
   const [editMode, setEditMode] = useState("");
@@ -46,10 +46,10 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
   useEffect(() => {
-    if (!isLoadingPaintings && !error) {
-      setPaintings(collectionGallery);
+    if (!isLoadingGallery && !error) {
+      setPaintings(gallery);
     }
-  }, [collectionGallery, isLoadingPaintings]);
+  }, [gallery, isLoadingGallery]);
 
   const handleOnNewPaintingCreate = async () => {
     const fullPaintingObject = {
@@ -147,7 +147,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
       maxWidth={"md"}
       open={open}
     >
-      {isLoadingPaintings ? (
+      {isLoadingGallery ? (
         <div style={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress color="success" />
         </div>

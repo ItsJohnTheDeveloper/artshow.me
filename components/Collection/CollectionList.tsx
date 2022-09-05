@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Chip, Menu, MenuItem } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useUser } from "../../contexts/user-context";
+import Spacer from "../Spacer";
 
 const CollectionList = ({
   artist,
-  collections,
   selectedCollection,
   setSelectedCollection,
   openEditDialog,
@@ -42,6 +42,7 @@ const CollectionList = ({
         }}
       >
         <Chip
+          size="medium"
           label={showAllOption.name}
           variant={
             selectedCollection?.name === showAllOption.name
@@ -49,14 +50,16 @@ const CollectionList = ({
               : "outlined"
           }
           onClick={(e) => setCollection(showAllOption.name, showAllOption.id)}
-          style={{ height: 46, marginRight: 6 }}
+          style={{ fontSize: 16, height: 42 }}
         />
-        {collections.map((collection, i) => {
+        <Spacer y={2} />
+        {artist.collections.map((collection, i) => {
           const [menuOpen, setMenuOpen] = useState(false);
 
           return (
             <React.Fragment key={collection.id}>
               <Chip
+                size="medium"
                 key={i}
                 label={collection.name}
                 variant={
@@ -67,7 +70,7 @@ const CollectionList = ({
                 onClick={(e) =>
                   handleChipOnClick(e, menuOpen, setMenuOpen, collection.id)
                 }
-                style={{ height: 46 }}
+                style={{ fontSize: 16, height: 42 }}
               />
               {isMyProfile && (
                 <Menu

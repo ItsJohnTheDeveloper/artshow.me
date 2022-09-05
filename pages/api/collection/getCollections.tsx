@@ -3,12 +3,24 @@ import prisma from "../../../lib/prisma";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
-    const collectionId = req.query.id as string;
+    const { id: collectionId, userId, all } = req.query as any;
+
     if (!collectionId) {
       return res.status(404).json("404 - No collection id found");
     }
 
     try {
+      // if "all" is true, return all artwork (please paginate)
+      if (all) {
+        const allArtwork = await prisma.painting.findMany({
+          where: {
+            userId,
+          },
+        });
+        return res.status(200).json(allArtwork);
+      }
+
+      // if "all" is false, return artwork in collection
       const collection = await prisma.collection.findUnique({
         where: { id: collectionId },
       });
@@ -23,9 +35,6 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       );
 
       res.status(200).json(sorted);
-      console.log(
-        `Paintings in collection: ${collectionId} successfully FETCHED`
-      );
     } catch (err) {
       console.error(err);
       res.status(403).json({ err: `An Error occurred: ${err}` });

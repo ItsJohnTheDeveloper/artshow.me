@@ -17,6 +17,7 @@ import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFil
 import { useUser } from "../../contexts/user-context";
 import axios from "axios";
 import ReactSelect from "../Common/ReactSelect";
+import { ArtistDocument } from "../../models/Artist";
 
 type AddArtworkForm = {
   name: string;
@@ -26,7 +27,13 @@ type AddArtworkForm = {
   collections: { label: string; value: string }[];
 };
 
-const AddArtworkDialog = ({ open, setOpen }) => {
+type AddArtworkDialogProps = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  artist: ArtistDocument;
+};
+
+const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
   const {
     register,
     control,
@@ -226,7 +233,7 @@ const AddArtworkDialog = ({ open, setOpen }) => {
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog}>Cancel</Button>
+        <Button onClick={closeDialog}>Close</Button>
       </DialogActions>
 
       <Snackbar
