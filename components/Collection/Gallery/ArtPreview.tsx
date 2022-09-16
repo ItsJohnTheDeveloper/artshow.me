@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { Grid } from "@mui/material";
 import { styled } from "@mui/system";
 import { Paper } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { showAllOption } from "../../../utils/helpers/getDefaultValues";
-import ArtDialog from "./ArtDialog";
 
 const StyledArtImageWrapper = styled("div")({
   height: 290,
@@ -59,9 +57,7 @@ const StyledColumnLeft = styled("div")({
 
 const ArtPreview = ({ data, collection }) => {
   const router = useRouter();
-
-  const [artDialogOpen, setArtDialogOpen] = useState(false);
-  const { id, image, name, price, width, height, collectionId, userId } = data;
+  const { id, image, name, price, width, height, userId } = data;
 
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
 
@@ -90,9 +86,8 @@ const ArtPreview = ({ data, collection }) => {
   );
 
   const handleOnClickDialog = () => {
-    setArtDialogOpen(true);
     router.query.artId = id;
-    router.push(router);
+    router.push(router, undefined, { scroll: false });
   };
 
   return (
@@ -111,11 +106,6 @@ const ArtPreview = ({ data, collection }) => {
             <StyledArtCard onClick={handleOnClickDialog} />
           )}
         </StyledArtPaper>
-        <ArtDialog
-          open={artDialogOpen}
-          setOpen={setArtDialogOpen}
-          artwork={data}
-        />
       </Grid>
     </>
   );

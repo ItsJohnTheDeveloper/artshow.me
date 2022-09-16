@@ -17,6 +17,7 @@ import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
 import AddArtworkDialog from "../Modal/AddArtworkDialog";
+import ArtDialog from "../Collection/Gallery/ArtDialog";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -135,6 +136,8 @@ const Artist = ({ artist }: ArtistProps) => {
       console.error(err);
     }
   };
+
+  const showAllSelected = selectedCollection.id === showAllOption.id;
 
   return (
     <div>
@@ -329,6 +332,7 @@ const Artist = ({ artist }: ArtistProps) => {
         open={editDialogOpen}
         setOpen={setEditDialogOpen}
       />
+      {showAllSelected && <ArtDialog />}
     </div>
   );
 };
