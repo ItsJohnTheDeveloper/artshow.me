@@ -1,7 +1,6 @@
 import { Close } from "@mui/icons-material";
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,8 +10,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-import useArtwork from "../../../utils/hooks/useArtwork";
+import { useArtwork } from "../../../utils/hooks/useQueryData";
 import Spacer from "../../Spacer";
 
 const ArtDialog = () => {
@@ -27,7 +25,7 @@ const ArtDialog = () => {
   };
 
   if (isLoading) {
-    return <CircularProgress />;
+    return null;
   }
 
   const { description, width, height, image, name, price, id } = artwork;

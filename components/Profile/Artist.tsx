@@ -12,7 +12,7 @@ import { Artist } from "../../models/Artist";
 import CollectionList from "../Collection/CollectionList";
 import ArtPreview from "../Collection/Gallery/ArtPreview";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import useGallery from "../../utils/hooks/useGallery";
+import { useCollection } from "../../utils/hooks/useQueryData";
 import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
@@ -76,17 +76,10 @@ const Artist = ({ artist }: ArtistProps) => {
     useState(false);
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
-  const {
-    gallery,
-    isLoading: isLoadingGallery,
-    updateGallery,
-    error,
-  } = useGallery(selectedCollection?.id, artist.id);
-
-  useEffect(() => {
-    // update the collection when the EditCollectionDialog closes
-    updateGallery();
-  }, [editDialogOpen]);
+  const { data: gallery, isLoading: isLoadingGallery } = useCollection({
+    userId: artist.id,
+    id: selectedCollection?.id,
+  });
 
   const {
     register,
@@ -313,7 +306,7 @@ const Artist = ({ artist }: ArtistProps) => {
         </Typography>
       )}
 
-      {gallery?.length && !isLoadingGallery && (
+      {!!(gallery?.length && !isLoadingGallery) && (
         <GalleryGrid>
           {gallery?.map((artwork) => (
             <ArtPreview

@@ -1,17 +1,28 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../lib/prisma";
+import { showAllOption } from "../../../utils/helpers/getDefaultValues";
 
+//TODO: please paginate this!!!
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
-    const { id: collectionId, userId, all } = req.query as any;
+    const { id: collectionId, userId, limited } = req.query as any;
 
-    if (!collectionId) {
-      return res.status(404).json("404 - No collection id found");
-    }
+    const showAllUsersArt = collectionId === showAllOption.id;
 
     try {
-      // if "all" is true, return all artwork (please paginate)
-      if (all) {
+      // if "limited" is true, return all collections.
+      if (limited) {
+        const collections = await prisma.collection.findMany({
+          where: { userId },
+        });
+
+        if (limited) {
+          return res.status(200).json(collections);
+        }
+      }
+
+      // if "Show all" is the collectionId, return all artwork (all of users art).
+      if (showAllUsersArt) {
         const allArtwork = await prisma.painting.findMany({
           where: {
             userId,
@@ -20,7 +31,10 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(200).json(allArtwork);
       }
 
-      // if "all" is false, return artwork in collection
+      // else return the collection artwork based on the collectionId.
+      if (!collectionId) {
+        return res.status(404).json("404 - No collection id found");
+      }
       const collection = await prisma.collection.findUnique({
         where: { id: collectionId },
       });

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
   Button,
@@ -18,6 +18,7 @@ import { useUser } from "../../contexts/user-context";
 import axios from "axios";
 import ReactSelect from "../Common/ReactSelect";
 import { ArtistDocument } from "../../models/Artist";
+import { useCollection } from "../../utils/hooks/useQueryData";
 
 type AddArtworkForm = {
   name: string;
@@ -45,18 +46,23 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
     reset,
   } = useForm();
 
+  const { getUser: loggedInUser } = useUser();
+
   const watchedName = watch("name");
   const watchedImage = watch("image");
   const watchedDescription = watch("description");
   const submitDisabled = !watchedName || !watchedImage || !watchedDescription;
-  const [usersCollections, setUsersCollections] = useState([]);
+
+  const { data: usersCollections } = useCollection({
+    limited: true,
+    userId: loggedInUser.id,
+  });
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadingArtwork, setUploadingArtwork] = useState(false);
 
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
 
   const hiddenFileInputRef = useRef(null);
-  const { getUser: loggedInUser } = useUser();
 
   const resetArtworkForm = () => {
     reset();
@@ -103,20 +109,6 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
     setOpen(false);
     clearErrors("name");
   };
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const { data } = await axios.get("/collection/getAllCollections", {
-          params: { limited: true, userId: loggedInUser.id },
-        });
-        setUsersCollections(data);
-      } catch (err) {
-        console.error(err?.response?.data);
-      }
-    };
-    getData();
-  }, []);
 
   return (
     <Dialog

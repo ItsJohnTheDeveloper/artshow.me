@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Add } from "@mui/icons-material";
 import {
   Button,
@@ -17,12 +18,17 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useUser } from "../../contexts/user-context";
-import useGallery from "../../utils/hooks/useGallery";
 import Spacer from "../Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
+import { useCollection } from "../../utils/hooks/useQueryData";
+
+const quickSortCollection = (collection: any[], sortBy: any[]) => {
+  return (collection || []).sort(
+    (a, b) => sortBy.indexOf(a.id) - sortBy.indexOf(b.id)
+  );
+};
 
 const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
   const router = useRouter();
@@ -31,12 +37,13 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
   const { getUser: loggedInUser } = useUser();
 
   const {
-    gallery,
-    isLoading: isLoadingGallery,
-    error,
-  } = useGallery(selectedCollection?.id, artistId);
-
-  const [paintings, setPaintings] = useState(gallery);
+    data: collection,
+    isLoading: isLoadingCollection,
+    mutate,
+  } = useCollection({
+    userId: artistId,
+    id: selectedCollection?.id,
+  });
 
   const hiddenFileInputRef = useRef(null);
   const [editMode, setEditMode] = useState("");
@@ -45,11 +52,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
 
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
-  useEffect(() => {
-    if (!isLoadingGallery && !error) {
-      setPaintings(gallery);
-    }
-  }, [gallery, isLoadingGallery]);
+  const [editedCollectionOrder, setEditedCollectionOrder] = useState([]);
 
   const handleOnNewPaintingCreate = async () => {
     const fullPaintingObject = {
@@ -61,14 +64,15 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     };
 
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         "/painting/create",
         fullPaintingObject,
-        { headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` } }
+        {
+          headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
+        }
       );
-
-      // once the painting is created, add it to the collection
-      setPaintings([...paintings, response.data]);
+      // revalidate cache with newly created painting
+      mutate([...collection, data]);
     } catch (err) {
       console.error(err);
     }
@@ -93,23 +97,21 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     }
 
     const items: any = reorder(
-      paintings,
+      collection,
       result.source.index,
       result.destination.index
     );
-
-    setPaintings(items);
+    const itemIds = items.map((item) => item.id);
+    setEditedCollectionOrder(itemIds);
   };
 
   const handleOnCollectionSave = async () => {
-    const orderOfPaintings = paintings.map((painting) => painting.id);
-
     try {
       await axios.patch(
         "/collection/updateCollectionOrder",
         {
           id: selectedCollection.id,
-          order: orderOfPaintings,
+          order: editedCollectionOrder,
         },
         { headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` } }
       );
@@ -147,7 +149,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
       maxWidth={"md"}
       open={open}
     >
-      {isLoadingGallery ? (
+      {isLoadingCollection ? (
         <div style={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress color="success" />
         </div>
@@ -171,7 +173,10 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                 <Droppable droppableId="droppable">
                   {(provided, snapshot) => (
                     <div {...provided.droppableProps} ref={provided.innerRef}>
-                      {paintings?.map((painting, index) => {
+                      {quickSortCollection(
+                        collection,
+                        editedCollectionOrder
+                      ).map((painting, index) => {
                         const isEditing = painting.id === editMode;
 
                         if (isEditing) {

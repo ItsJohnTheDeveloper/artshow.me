@@ -16,7 +16,7 @@ const StyledArtPaper = styled(Paper)({
   marginBottom: 10,
   borderRadius: 10,
   position: "sticky",
-  top: 24,
+  top: 106,
 });
 
 export const getServerSideProps: GetServerSideProps = async ({
