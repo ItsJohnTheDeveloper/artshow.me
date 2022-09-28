@@ -16,7 +16,6 @@ import Spacer from "../../Spacer";
 const ArtDialog = () => {
   const router = useRouter();
   const { artId } = router.query;
-
   const { data: artwork, isLoading, isError } = useArtwork(artId);
 
   const handleOnCloseDialog = () => {
@@ -28,14 +27,26 @@ const ArtDialog = () => {
     return null;
   }
 
-  const { description, width, height, image, name, price, id } = artwork;
+  const {
+    description,
+    height,
+    width,
+    sizeUnit,
+    image,
+    name,
+    price,
+    id,
+    showPrice,
+  } = artwork;
   const formattedSize = `w${width} x h${height}`;
   const formattedPrice = new Intl.NumberFormat("en-CA").format(price);
+
+  console.log({ showPrice });
 
   return (
     <Dialog
       fullWidth
-      maxWidth="lg"
+      maxWidth="md"
       open
       onClose={handleOnCloseDialog}
       scroll="body"
@@ -62,18 +73,25 @@ const ArtDialog = () => {
           <Spacer y={2} />
           <Typography variant="h3">{name + " testingjgnsk"}</Typography>
           <Spacer y={0.5} />
-          <Typography variant="body1">{description}</Typography>
-          <Spacer y={0.5} />
-          <span style={{ color: "#999999", fontSize: 13, paddingTop: 3 }}>
-            Size: {formattedSize}
-          </span>
+          <Typography variant="h5">{description}</Typography>
+          {sizeUnit && (
+            <>
+              <Spacer y={0.5} />
+              <Typography sx={{ color: "#d5d5d5" }} variant="body1">
+                Size: {`${height} x ${width} ${sizeUnit}`}
+              </Typography>
+            </>
+          )}
           <Spacer y={2} />
-          <Typography variant="h4">${formattedPrice}</Typography>
-          <Spacer y={1} />
-
-          <Button size="medium" variant="contained">
-            Buy artwork
-          </Button>
+          {showPrice && (
+            <>
+              <Typography variant="h4">${formattedPrice}</Typography>
+              <Spacer y={1} />
+              <Button size="medium" variant="contained">
+                Buy artwork
+              </Button>
+            </>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>

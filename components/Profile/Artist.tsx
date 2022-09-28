@@ -293,32 +293,34 @@ const Artist = ({ artist }: ArtistProps) => {
           )}
         </StyledProfileWrapper>
       </div>
-      <CollectionList
-        artist={artist}
-        selectedCollection={selectedCollection}
-        setSelectedCollection={setSelectedCollection}
-        openEditDialog={() => setEditDialogOpen(true)}
-      />
+      <div style={{ minHeight: "94vh" }}>
+        <Spacer y={1} />
 
-      {!gallery?.length && !isLoadingGallery && (
-        <Typography variant="h5" marginLeft={3}>
-          This collection is empty
-        </Typography>
-      )}
+        <CollectionList
+          artist={artist}
+          selectedCollection={selectedCollection}
+          setSelectedCollection={setSelectedCollection}
+          openEditDialog={() => setEditDialogOpen(true)}
+        />
 
-      {!!(gallery?.length && !isLoadingGallery) && (
-        <GalleryGrid>
-          {gallery?.map((artwork) => (
-            <ArtPreview
-              key={artwork.id}
-              data={artwork}
-              collection={selectedCollection}
-            />
-          ))}
-        </GalleryGrid>
-      )}
+        {!gallery?.length && !isLoadingGallery && (
+          <Typography variant="h5" marginLeft={3}>
+            This collection is empty
+          </Typography>
+        )}
 
-      <Spacer y={isLoadingGallery ? 80 : 50} />
+        {!!(gallery?.length && !isLoadingGallery) && (
+          <GalleryGrid>
+            {gallery?.map((artwork) => (
+              <ArtPreview
+                key={artwork.id}
+                data={artwork}
+                collection={selectedCollection}
+              />
+            ))}
+          </GalleryGrid>
+        )}
+      </div>
 
       <EditCollectionDialog
         selectedCollection={selectedCollection}

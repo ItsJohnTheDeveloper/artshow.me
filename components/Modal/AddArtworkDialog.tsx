@@ -2,11 +2,14 @@ import React, { useRef, useState } from "react";
 import {
   Alert,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   FormHelperText,
+  MenuItem,
   Snackbar,
   TextField,
   Typography,
@@ -26,6 +29,9 @@ type AddArtworkForm = {
   title: string;
   description: string;
   collections: { label: string; value: string }[];
+  width: number;
+  height: number;
+  sizeUnit: string;
 };
 
 type AddArtworkDialogProps = {
@@ -59,6 +65,7 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
   });
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadingArtwork, setUploadingArtwork] = useState(false);
+  const [showSizeInput, setShowSizeInput] = useState(false);
 
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
 
@@ -77,11 +84,18 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
       name: data.name,
       description: data.description,
       image: data.image,
-      width: 123,
-      height: 123,
+      width: null,
+      height: null,
+      sizeUnit: null,
       userId: loggedInUser.id,
       collectionIds: [],
     };
+
+    if (showSizeInput && data?.width && data?.height && data?.sizeUnit) {
+      paintingObject.width = Number(data.width);
+      paintingObject.height = Number(data.height);
+      paintingObject.sizeUnit = data.sizeUnit;
+    }
 
     if (data?.collections?.length) {
       const collectionList = data.collections.map(
@@ -201,20 +215,81 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
           )}
           <Spacer y={2} />
           {watchedName && watchedImage && (
-            <TextField
-              fullWidth
-              id="outlined-description"
-              variant="outlined"
-              label="Description"
-              {...register("description", { required: true })}
-            />
+            <>
+              <TextField
+                fullWidth
+                id="outlined-description"
+                variant="outlined"
+                label="Description"
+                {...register("description", { required: true })}
+              />
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showSizeInput}
+                      onChange={() => setShowSizeInput(!showSizeInput)}
+                      inputProps={{ "aria-label": "controlled" }}
+                    />
+                  }
+                  label="Show art dimensions"
+                />
+
+                {showSizeInput && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "12px 0px",
+                    }}
+                  >
+                    <TextField
+                      id="outlined-height"
+                      label="Height"
+                      type="number"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      sx={{ width: 81 }}
+                      {...register("height", { required: true })}
+                    />
+                    <span style={{ margin: "0px 12px" }}>X</span>
+                    <TextField
+                      id="outlined-width"
+                      label="Width"
+                      type="number"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      sx={{ width: 81 }}
+                      {...register("width", { required: true })}
+                    />
+                    <Spacer x={2} />
+                    <TextField
+                      id="outlined-unit-measurement"
+                      select
+                      label="Unit"
+                      value={showSizeInput ? "in" : null}
+                      onChange={() => {}}
+                      {...register("sizeUnit", { required: true })}
+                    >
+                      {[{ value: "in", label: "in" }].map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </div>
+                )}
+              </div>
+            </>
           )}
           {errors.name && (
             <Typography variant="body1" color={"#c33333"}>
               Name required
             </Typography>
           )}
-          <Spacer y={2} />
+          <Spacer y={4} />
           <Button
             variant="contained"
             type={"submit"}

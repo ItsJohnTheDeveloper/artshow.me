@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import { Paper } from "@mui/material";
 import Link from "next/link";
@@ -57,7 +57,8 @@ const StyledColumnLeft = styled("div")({
 
 const ArtPreview = ({ data, collection }) => {
   const router = useRouter();
-  const { id, image, name, price, width, height, userId } = data;
+  const { id, image, name, price, height, width, sizeUnit, userId, showPrice } =
+    data;
 
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
 
@@ -71,16 +72,20 @@ const ArtPreview = ({ data, collection }) => {
       <StyledInfoWrapper>
         <StyledColumnRight>
           <StyledTitle>{name}</StyledTitle>
-          <span style={{ color: "#999999", fontSize: 10, paddingTop: 3 }}>
-            Size: w{width} X h{height}
-          </span>
+          {sizeUnit && (
+            <Typography sx={{ color: "#d5d5d5" }} variant="subtitle2">
+              Size: {`${height} x ${width} ${sizeUnit}`}
+            </Typography>
+          )}
         </StyledColumnRight>
-        <StyledColumnLeft>
-          <span style={{ color: "grey", fontSize: 12 }}>Price</span>
-          <span style={{ fontSize: 14, fontWeight: "bold" }}>
-            {price ? `${priceFormatted}` : "na"}
-          </span>
-        </StyledColumnLeft>
+        {showPrice && (
+          <StyledColumnLeft>
+            <span style={{ color: "grey", fontSize: 12 }}>Price</span>
+            <span style={{ fontSize: 14, fontWeight: "bold" }}>
+              {price ? `${priceFormatted}` : "na"}
+            </span>
+          </StyledColumnLeft>
+        )}
       </StyledInfoWrapper>
     </div>
   );

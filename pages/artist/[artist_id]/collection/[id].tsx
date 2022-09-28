@@ -48,7 +48,17 @@ const Collection = (props) => {
   const painting = JSON.parse(props.data.painting);
   const collection = JSON.parse(props.data.collection);
 
-  const { description, width, height, image, name, price, id } = painting;
+  const {
+    description,
+    height,
+    width,
+    sizeUnit,
+    image,
+    name,
+    price,
+    id,
+    showPrice,
+  } = painting;
 
   const formattedSize = `w${width} x h${height}`;
   const formattedPrice = new Intl.NumberFormat("en-CA").format(price);
@@ -86,17 +96,24 @@ const Collection = (props) => {
             <Typography variant="h3">{name}</Typography>
             <Spacer y={0.5} />
             <Typography variant="body1">{description}</Typography>
-            <Spacer y={0.5} />
-            <span style={{ color: "#999999", fontSize: 13, paddingTop: 3 }}>
-              Size: {formattedSize}
-            </span>
+            {sizeUnit && (
+              <>
+                <Spacer y={0.5} />
+                <Typography sx={{ color: "#d5d5d5" }} variant="body1">
+                  Size: {`${height} x ${width} ${sizeUnit}`}
+                </Typography>
+              </>
+            )}
             <Spacer y={2} />
-            <Typography variant="h4">${formattedPrice}</Typography>
-            <Spacer y={1} />
-
-            <Button size="medium" variant="contained">
-              Buy artwork
-            </Button>
+            {showPrice && (
+              <>
+                <Typography variant="h4">${formattedPrice}</Typography>
+                <Spacer y={1} />
+                <Button size="medium" variant="contained">
+                  Buy artwork
+                </Button>
+              </>
+            )}
           </StyledArtPaper>
         </Grid>
       </Grid>

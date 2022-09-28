@@ -101,7 +101,7 @@ const Header: React.FC = () => {
   const RightNav = () => {
     if (!authedUser) {
       return (
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", justifyContent: "end" }}>
           <Button variant="text" onClick={handleOpenLoginModal}>
             Login
           </Button>

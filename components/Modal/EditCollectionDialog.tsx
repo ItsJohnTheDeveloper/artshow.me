@@ -353,7 +353,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                 Delete Collection
               </Button>
             </div>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => setOpen(false)}>Close</Button>
             <Button onClick={handleOnCollectionSave}>Save</Button>
           </DialogActions>
         </>

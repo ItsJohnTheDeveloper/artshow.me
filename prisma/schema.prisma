@@ -39,8 +39,10 @@ model Painting {
   image      String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  width        Int
-  height      Int
+  width        Int?
+  height      Int?
+  sizeUnit   String?
+  showPrice   Boolean @default(false)
   price      Int?
   description String?
   userId   String   @unique @db.ObjectId

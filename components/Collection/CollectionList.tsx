@@ -20,12 +20,13 @@ const CollectionList = ({
   return (
     <div
       style={{
-        margin: "24px 0px 0px",
-        paddingBottom: 12,
-        paddingLeft: 24,
+        position: "sticky",
+        top: 81,
+        padding: "5px 24px",
+        backgroundColor: "#202225f2",
       }}
     >
-      <div style={{ display: "flex", overflow: "auto", gap: 6 }}>
+      <div style={{ display: "flex", gap: 6 }}>
         <Chip
           size="medium"
           label={showAllOption.name}
@@ -35,7 +36,7 @@ const CollectionList = ({
               : "outlined"
           }
           onClick={() => setCollection(showAllOption.name, showAllOption.id)}
-          style={{ fontSize: 16, height: 42 }}
+          style={{ fontSize: 16, height: 39 }}
         />
         <Spacer y={2} />
         {artist.collections.map((collection, i) => (
@@ -52,7 +53,7 @@ const CollectionList = ({
               onClick={(e) => {
                 setCollection(e.currentTarget.innerText, collection.id);
               }}
-              style={{ fontSize: 16, height: 42 }}
+              style={{ fontSize: 16, height: 39 }}
             />
           </React.Fragment>
         ))}
