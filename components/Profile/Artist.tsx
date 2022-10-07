@@ -17,7 +17,7 @@ import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
 import AddArtworkDialog from "../Modal/AddArtworkDialog";
-import ArtDialog from "../Collection/Gallery/ArtDialog";
+import ArtDialog from "../Collection/Gallery/Dialog/ArtDialog";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -280,7 +280,6 @@ const Artist = ({ artist }: ArtistProps) => {
                   <AddArtworkDialog
                     open={addArtworkDialogOpen}
                     setOpen={setAddArtworkDialogOpen}
-                    artist={artist}
                   />
                   <CreateCollectionDialog
                     open={createCollectionDialogOpen}

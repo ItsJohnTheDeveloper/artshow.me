@@ -46,7 +46,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(200).json({ id: existingUser.id, accessToken, refreshToken });
     } catch (err) {
       console.error(err);
-      res.status(403).json({ err: `An Error occurred: ${err}` });
+      res.status(403).json({ message: `An Error occurred: ${err}` });
     }
   } else {
     return res.status(405).json("405 - Method Not Allowed");

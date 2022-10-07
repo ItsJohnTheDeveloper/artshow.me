@@ -2,26 +2,24 @@ import React, { useRef, useState } from "react";
 import {
   Alert,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   FormHelperText,
-  MenuItem,
   Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import Spacer from "../Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 import { useUser } from "../../contexts/user-context";
 import axios from "axios";
 import ReactSelect from "../Common/ReactSelect";
-import { ArtistDocument } from "../../models/Artist";
 import { useCollection } from "../../utils/hooks/useQueryData";
+import ArtDimensionsForm from "../Common/ArtDimensionsForm";
+import { useSWRConfig } from "swr";
 
 type AddArtworkForm = {
   name: string;
@@ -37,10 +35,10 @@ type AddArtworkForm = {
 type AddArtworkDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  artist: ArtistDocument;
 };
 
-const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
+const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
+  const methods = useForm();
   const {
     register,
     control,
@@ -50,9 +48,10 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
     clearErrors,
     watch,
     reset,
-  } = useForm();
+  } = methods;
 
   const { getUser: loggedInUser } = useUser();
+  const { mutate: globalMutate } = useSWRConfig();
 
   const watchedName = watch("name");
   const watchedImage = watch("image");
@@ -63,6 +62,7 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
     limited: true,
     userId: loggedInUser.id,
   });
+
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadingArtwork, setUploadingArtwork] = useState(false);
   const [showSizeInput, setShowSizeInput] = useState(false);
@@ -108,13 +108,16 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
       await axios.post("/painting/create", paintingObject, {
         headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
       });
-      setUploadingArtwork(false);
+      globalMutate(
+        `/api/collection/getCollections?userId=${loggedInUser.id}&id=all`
+      );
 
       // clear the artwork form.
       resetArtworkForm();
     } catch (err) {
       // TODO: handle error later
       console.error(err);
+    } finally {
       setUploadingArtwork(false);
     }
   };
@@ -141,163 +144,110 @@ const AddArtworkDialog = ({ open, setOpen, artist }: AddArtworkDialogProps) => {
     >
       <DialogTitle>Add new Artwork</DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit(handleAddArtworkSubmit)}>
-          <Spacer y={2} />
-          <Controller
-            control={control}
-            name="collections"
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <ReactSelect
-                label={"Collections"}
-                isMulti
-                onChange={onChange}
-                options={usersCollections?.map((col) => ({
-                  value: col.id,
-                  label: col.name,
-                }))}
-                placeholder={"No Collection"}
-                onBlur={onBlur}
-                value={value}
-                ref={ref}
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(handleAddArtworkSubmit)}>
+            <Spacer y={2} />
+            <Controller
+              control={control}
+              name="collections"
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <ReactSelect
+                  label={"Collections"}
+                  isMulti
+                  onChange={onChange}
+                  options={(usersCollections || []).map((col) => ({
+                    value: col.id,
+                    label: col.name,
+                  }))}
+                  placeholder={"No Collection"}
+                  onBlur={onBlur}
+                  value={value}
+                  ref={ref}
+                />
+              )}
+            />
+            <FormHelperText style={{ paddingLeft: 12 }}>
+              {`Add Artwork to your Collection(s).`}
+            </FormHelperText>
+            <Spacer y={2} />
+            <TextField
+              fullWidth
+              id="outlined-name"
+              label="Artwork Name"
+              variant="outlined"
+              {...register("name", { required: true })}
+            />
+            <Spacer y={2} />
+            {watchedImage && (
+              <img
+                src={watchedImage}
+                height={150}
+                width={550}
+                style={{ objectFit: "cover" }}
               />
             )}
-          />
-          <FormHelperText style={{ paddingLeft: 12 }}>
-            {`Add Artwork to your Collection(s).`}
-          </FormHelperText>
-          <Spacer y={2} />
-          <TextField
-            fullWidth
-            id="outlined-name"
-            label="Artwork Name"
-            variant="outlined"
-            {...register("name", { required: true })}
-          />
-          <Spacer y={2} />
-          {watchedImage && (
-            <img
-              src={watchedImage}
-              height={150}
-              width={550}
-              style={{ objectFit: "cover" }}
-            />
-          )}
-          {!watchedImage && (
-            <>
-              <Button
-                fullWidth
-                style={{ height: 150 }}
-                onClick={() => {
-                  hiddenFileInputRef.current.click();
-                }}
-                disabled={isUploadingImage}
-              >
-                {isUploadingImage ? "Uploading image..." : "Add image"}
-              </Button>
-              <input
-                type={"file"}
-                ref={hiddenFileInputRef}
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  setIsUploadingImage(true);
-                  handleUploadPaintingPicture(
-                    file,
-                    loggedInUser.id,
-                    (url: string) => {
-                      setValue("image", url);
-                      setIsUploadingImage(false);
-                    }
-                  );
-                }}
-              />
-            </>
-          )}
-          <Spacer y={2} />
-          {watchedName && watchedImage && (
-            <>
-              <TextField
-                fullWidth
-                id="outlined-description"
-                variant="outlined"
-                label="Description"
-                {...register("description", { required: true })}
-              />
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={showSizeInput}
-                      onChange={() => setShowSizeInput(!showSizeInput)}
-                      inputProps={{ "aria-label": "controlled" }}
-                    />
-                  }
-                  label="Show art dimensions"
+            {!watchedImage && (
+              <>
+                <Button
+                  fullWidth
+                  style={{ height: 150 }}
+                  onClick={() => {
+                    hiddenFileInputRef.current.click();
+                  }}
+                  disabled={isUploadingImage}
+                >
+                  {isUploadingImage ? "Uploading image..." : "Add image"}
+                </Button>
+                <input
+                  type={"file"}
+                  ref={hiddenFileInputRef}
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    setIsUploadingImage(true);
+                    handleUploadPaintingPicture(
+                      file,
+                      loggedInUser.id,
+                      (url: string) => {
+                        setValue("image", url);
+                        setIsUploadingImage(false);
+                      }
+                    );
+                  }}
                 />
-
-                {showSizeInput && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "12px 0px",
-                    }}
-                  >
-                    <TextField
-                      id="outlined-height"
-                      label="Height"
-                      type="number"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      sx={{ width: 81 }}
-                      {...register("height", { required: true })}
-                    />
-                    <span style={{ margin: "0px 12px" }}>X</span>
-                    <TextField
-                      id="outlined-width"
-                      label="Width"
-                      type="number"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      sx={{ width: 81 }}
-                      {...register("width", { required: true })}
-                    />
-                    <Spacer x={2} />
-                    <TextField
-                      id="outlined-unit-measurement"
-                      select
-                      label="Unit"
-                      value={showSizeInput ? "in" : null}
-                      onChange={() => {}}
-                      {...register("sizeUnit", { required: true })}
-                    >
-                      {[{ value: "in", label: "in" }].map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-          {errors.name && (
-            <Typography variant="body1" color={"#c33333"}>
-              Name required
-            </Typography>
-          )}
-          <Spacer y={4} />
-          <Button
-            variant="contained"
-            type={"submit"}
-            disabled={submitDisabled || uploadingArtwork}
-          >
-            {uploadingArtwork ? "Uploading..." : "Upload Art"}
-          </Button>
-        </form>
+              </>
+            )}
+            <Spacer y={2} />
+            {watchedName && watchedImage && (
+              <>
+                <TextField
+                  fullWidth
+                  id="outlined-description"
+                  variant="outlined"
+                  label="Description"
+                  {...register("description", { required: true })}
+                />
+                <ArtDimensionsForm
+                  showSizeInput={showSizeInput}
+                  setShowSizeInput={setShowSizeInput}
+                />
+              </>
+            )}
+            {errors.name && (
+              <Typography variant="body1" color={"#c33333"}>
+                Name required
+              </Typography>
+            )}
+            <Spacer y={4} />
+            <Button
+              variant="contained"
+              type={"submit"}
+              disabled={submitDisabled || uploadingArtwork}
+            >
+              {uploadingArtwork ? "Uploading..." : "Upload Art"}
+            </Button>
+          </form>
+        </FormProvider>
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog}>Close</Button>
