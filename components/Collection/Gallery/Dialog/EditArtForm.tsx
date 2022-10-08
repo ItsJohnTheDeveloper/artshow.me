@@ -3,34 +3,44 @@ import {
   Alert,
   Button,
   CircularProgress,
+  FormHelperText,
   IconButton,
   Snackbar,
   TextField,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 import { useUser } from "../../../../contexts/user-context";
 import { EditPaintingForm } from "../../../../models/Painting";
+import { handleUploadPaintingPicture } from "../../../../utils/helpers/handleUploadFile";
+import { useCollection } from "../../../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../../../Common/ArtDimensionsForm";
+import ReactSelect from "../../../Common/ReactSelect";
 import Spacer from "../../../Spacer";
 
 const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
   const methods = useForm();
-  const { register, handleSubmit } = methods;
+  const { register, control, handleSubmit, setValue, watch } = methods;
 
   const { mutate: globalMutate } = useSWRConfig();
   const { getUser: loggedInUser } = useUser();
+
+  const { data: usersCollections } = useCollection({
+    limited: true,
+    userId: loggedInUser.id,
+  });
 
   const [showSizeInput, setShowSizeInput] = useState(data.sizeUnit || false);
   const [serverMessage, setServerMessage] = useState(null);
   const [isUpdatingArtwork, setIsUpdatingArtwork] = useState(false);
   const editContainerRef = useRef(null);
 
-  //   TODO: implement change art photo functionality
+  const hiddenFileInputRef = useRef(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const watchedImage = watch("image");
 
-  console.log({ data });
   useEffect(() => {
     setTimeout(() => {
       editContainerRef?.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,6 +50,20 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
   const handleOnSubmit = async (formData: EditPaintingForm) => {
     setIsUpdatingArtwork(true);
 
+    const updatedPaintingObj = {
+      name: formData.name,
+      description: formData.description,
+      image: data?.image,
+      width: null,
+      height: null,
+      sizeUnit: null,
+      collectionIds: [],
+    };
+
+    if (formData?.image) {
+      updatedPaintingObj.image = formData.image;
+    }
+
     // TODO: handle formatting size in backend
     if (
       showSizeInput &&
@@ -47,19 +71,22 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
       formData?.width &&
       formData?.height
     ) {
-      formData.width = Number(formData.width);
-      formData.height = Number(formData.height);
-    } else {
-      formData.width = null;
-      formData.height = null;
-      formData.sizeUnit = null;
+      updatedPaintingObj.width = Number(formData.width);
+      updatedPaintingObj.height = Number(formData.height);
+      updatedPaintingObj.sizeUnit = formData.sizeUnit;
+    }
+
+    if (formData?.collections) {
+      const collectionList = formData.collections.map(
+        (collection) => collection.value
+      );
+      updatedPaintingObj.collectionIds = collectionList;
     }
 
     try {
-      console.log({ formData });
       const { data: resData } = await axios.patch(
         `/painting/update?id=${data.id}`,
-        { data: formData },
+        { data: updatedPaintingObj },
         {
           headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
         }
@@ -83,18 +110,78 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
     <>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(handleOnSubmit)}>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <img
-              src={data.image}
-              style={{ width: "75%", height: "auto", opacity: 0.8 }}
+          <div>
+            <Button
+              fullWidth
+              style={{ height: 75 }}
+              onClick={() => {
+                hiddenFileInputRef.current.click();
+              }}
+              disabled={isUploadingImage}
+            >
+              {isUploadingImage ? "Uploading image..." : "Change image"}
+            </Button>
+            <input
+              type={"file"}
+              ref={hiddenFileInputRef}
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                setIsUploadingImage(true);
+                handleUploadPaintingPicture(
+                  file,
+                  loggedInUser.id,
+                  (url: string) => {
+                    setValue("image", url);
+                    setIsUploadingImage(false);
+                  }
+                );
+              }}
             />
-            <IconButton aria-label="change" onClick={() => {}} size="small">
-              <Photo />
-              <Spacer x={1} />
-              change image
-            </IconButton>{" "}
+            <img
+              src={watchedImage || data.image}
+              style={{ width: "100%", height: "auto", opacity: 0.8 }}
+            />
           </div>
           <Spacer y={1} />
+          <span ref={editContainerRef} />
+          <Controller
+            control={control}
+            name="collections"
+            render={({ field: { onChange, onBlur, value, ref } }) => (
+              <ReactSelect
+                label={"Collections"}
+                isMulti
+                onChange={onChange}
+                options={(usersCollections || []).map((col) => ({
+                  value: col.id,
+                  label: col.name,
+                }))}
+                defaultValue={() => {
+                  let defaultCollectionIds = [];
+                  usersCollections?.forEach((item) => {
+                    if (data?.collectionIds?.includes(item.id)) {
+                      defaultCollectionIds.push({
+                        value: item.id,
+                        label: item.name,
+                      });
+                    }
+                  });
+                  return defaultCollectionIds;
+                }}
+                default
+                placeholder={"No Collection"}
+                onBlur={onBlur}
+                value={value}
+                ref={ref}
+              />
+            )}
+          />
+          <FormHelperText style={{ paddingLeft: 12 }}>
+            {`Add Artwork to your Collection(s).`}
+          </FormHelperText>
+
+          <Spacer y={2} />
           <div>
             <TextField
               {...register("name", { required: true })}
@@ -124,22 +211,20 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
               setShowSizeInput={setShowSizeInput}
             />
             <Spacer y={2} />
-            <div ref={editContainerRef}>
-              <Button variant="text" type={"submit"}>
-                {isUpdatingArtwork ? (
-                  <CircularProgress color="success" size={20} />
-                ) : (
-                  "save"
-                )}
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={handleCancelEditing}
-              >
-                {"cancel"}
-              </Button>
-            </div>
+            <Button variant="text" type={"submit"}>
+              {isUpdatingArtwork ? (
+                <CircularProgress color="success" size={20} />
+              ) : (
+                "save"
+              )}
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleCancelEditing}
+            >
+              {"cancel"}
+            </Button>
           </div>
         </form>
       </FormProvider>

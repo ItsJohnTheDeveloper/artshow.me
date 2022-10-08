@@ -17,9 +17,15 @@ export interface PaintingDocument extends MongoDocument {
 
 export interface Painting extends PaintingDocument {
   id: string;
+  collections?: [
+    {
+      label: string;
+      value: string;
+    }
+  ];
 }
 
 export type EditPaintingForm = Omit<
   Painting,
-  "createdAt" | "updatedAt" | "userId" | "collectionIds" | "_id" | "id"
+  "createdAt" | "updatedAt" | "userId" | "_id" | "id"
 >;

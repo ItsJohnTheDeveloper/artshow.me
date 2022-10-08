@@ -62,6 +62,14 @@ const ArtDialog = () => {
       open
       onClose={handleOnCloseDialog}
       scroll="body"
+      PaperProps={{
+        style: {
+          backgroundColor: "#212730",
+          boxShadow: "24px",
+          borderRadius: 12,
+          backgroundImage: "unset",
+        },
+      }}
     >
       <DialogTitle display={"flex"} justifyContent={"right"}>
         {!isEditingArt && (

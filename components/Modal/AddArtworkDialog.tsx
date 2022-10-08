@@ -12,14 +12,14 @@ import {
   Typography,
 } from "@mui/material";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useSWRConfig } from "swr";
 import Spacer from "../Spacer";
+import axios from "axios";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 import { useUser } from "../../contexts/user-context";
-import axios from "axios";
 import ReactSelect from "../Common/ReactSelect";
 import { useCollection } from "../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../Common/ArtDimensionsForm";
-import { useSWRConfig } from "swr";
 
 type AddArtworkForm = {
   name: string;
@@ -155,7 +155,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
                   label={"Collections"}
                   isMulti
                   onChange={onChange}
-                  options={(usersCollections || []).map((col) => ({
+                  options={usersCollections?.map((col) => ({
                     value: col.id,
                     label: col.name,
                   }))}
