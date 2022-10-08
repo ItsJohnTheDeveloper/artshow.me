@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <Layout>
       <div className="page">
-        <main></main>
+        <main>this page is intentionally blank</main>
       </div>
     </Layout>
   );
