@@ -16,6 +16,8 @@ export const getServerSideProps = async ({ params }) => {
     where: { userId: params.artist_id },
   });
 
+  prisma.$disconnect();
+
   return {
     props: {
       data: {
