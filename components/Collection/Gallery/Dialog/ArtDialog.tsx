@@ -38,7 +38,7 @@ const ArtDialog = () => {
     router.push(router, undefined, { scroll: false });
   };
 
-  if (isLoading) {
+  if (!artId || isLoading) {
     return null;
   }
 
