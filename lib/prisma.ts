@@ -7,7 +7,9 @@ type CustomGlobal = Global & {
 
 // Prevent multiple instances of Prisma Client in development
 declare const global: CustomGlobal;
-const prisma = global.prisma || new PrismaClient();
+const prisma =
+  global.prisma ||
+  new PrismaClient({ log: ["query", "info", "warn", "error"] });
 
 // re-use existing prisma client on consecutive hot reloads
 if (process.env.NODE_ENV === "development") {
