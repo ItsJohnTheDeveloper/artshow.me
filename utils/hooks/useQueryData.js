@@ -6,7 +6,6 @@ const fetcher = (url) => axios.get(url).then((res) => res.data);
 const useArtwork = (id) => {
   const url = id && `/painting/${id}`;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
-  console.log({ isError });
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
@@ -22,4 +21,10 @@ const useCollection = (params = undefined) => {
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
-export { useArtwork, useCollection };
+const useArtist = (id) => {
+  const url = id && `/users/${id}`;
+  const { data, error: isError, mutate } = useSWR(url, fetcher);
+  return { data, isLoading: url ? !isError && !data : true, isError, mutate };
+};
+
+export { useArtwork, useCollection, useArtist };

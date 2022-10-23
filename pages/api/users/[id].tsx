@@ -1,33 +1,49 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../lib/prisma";
+import { ArtistDocument } from "../../../models/Artist";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "PATCH") {
-    if (!req.body) {
-      return res.status(404).json("404 - No request body found");
-    }
+  switch (req.method) {
+    case "GET":
+      if (!req.query) {
+        return res.status(404).json({ message: "No request query found" });
+      }
+      const id = req.query.id as string;
 
-    const userId = req.query.id as string;
-    const { name, bio, profilePic } = req.body;
+      try {
+        const response: ArtistDocument = await prisma.user.findUnique({
+          where: { id },
+        });
+        res.status(200).json(response);
+      } catch (err) {
+        res.status(403).json({ message: `An Error occurred: ${err}` });
+      }
 
-    try {
-      const response = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          name,
-          bio,
-          profilePic,
-        },
-      });
+      break;
+    case "PATCH":
+      if (!req.body) {
+        return res.status(404).json({ message: "No request body found" });
+      }
+      const userId = req.query.id as string;
+      const { name, bio, profilePic } = req.body;
+      try {
+        const response = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            name,
+            bio,
+            profilePic,
+          },
+        });
 
-      res.status(200).json(response);
-      console.log(`user successfully PATCHED`);
-    } catch (err) {
-      console.error(err);
-      res.status(403).json({ message: `An Error occurred: ${err}` });
-    }
-  } else {
-    return res.status(405).json("405 - Method Not Allowed");
+        res.status(200).json(response);
+        console.log(`user successfully PATCHED`);
+      } catch (err) {
+        res.status(403).json({ message: `An Error occurred: ${err}` });
+      }
+      break;
+    default:
+      return res.status(405).json("405 - Method Not Allowed");
   }
 };
 

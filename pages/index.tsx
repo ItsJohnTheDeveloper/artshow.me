@@ -18,7 +18,7 @@ const Home = () => {
           </Link>{" "}
           or create a new account.
         </span>
-        <br /> <br />
+        {/* <br /> <br />
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -30,7 +30,7 @@ const Home = () => {
         <br /> <br />
         {isLoading && <h4>Loading...</h4>}
         {artwork && <div>{artwork.name}</div>}
-        {isError && isError.response.data.message}
+        {isError && isError.response.data.message} */}
       </div>
     </Layout>
   );

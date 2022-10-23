@@ -3,15 +3,24 @@ import { Button, Chip } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useUser } from "../../contexts/user-context";
 import Spacer from "../Spacer";
+import { useCollection } from "../../utils/hooks/useQueryData";
+import { useRouter } from "next/router";
 
 const CollectionList = ({
-  artist,
   selectedCollection,
   setSelectedCollection,
   openEditDialog,
 }) => {
+  const router = useRouter();
+  const artistId = router.query?.artist_id;
+
   const { getUser: loggedInUser } = useUser();
-  const isMyProfile = loggedInUser && loggedInUser.id === artist?.id;
+  const isMyProfile = loggedInUser && loggedInUser.id === artistId;
+
+  const { data: usersCollections, isLoading } = useCollection({
+    limited: true,
+    userId: artistId,
+  });
 
   const setCollection = (name, id) => {
     setSelectedCollection({ name, id });
@@ -39,7 +48,8 @@ const CollectionList = ({
           style={{ fontSize: 16, height: 39 }}
         />
         <Spacer y={2} />
-        {artist.collections.map((collection, i) => (
+        {isLoading && <div>Loading...</div>}
+        {usersCollections?.map((collection, i) => (
           <React.Fragment key={collection.id}>
             <Chip
               size="medium"

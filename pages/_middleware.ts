@@ -35,10 +35,11 @@ const isAuthenticated = (req: NextRequest) => {
 };
 
 export function middleware(request: NextRequest) {
-  const route = request.nextUrl.pathname;
+  const page = request.page.name;
+  const method = request.method;
 
   // Protected Routes
-  switch (route) {
+  switch (page) {
     // Collections
     case "/api/collection/create":
       return isAuthenticated(request);
@@ -52,6 +53,12 @@ export function middleware(request: NextRequest) {
     // Paintings
     case "/api/painting/create":
       return isAuthenticated(request);
+
+    // Users
+    case "/api/users/[id]":
+      if (method === "PATCH") {
+        return isAuthenticated(request);
+      }
 
     // add more protected auth routes here...
 

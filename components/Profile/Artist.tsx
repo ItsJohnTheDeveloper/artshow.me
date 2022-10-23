@@ -18,6 +18,7 @@ import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
 import AddArtworkDialog from "../Modal/AddArtworkDialog";
 import ArtDialog from "../Collection/Gallery/Dialog/ArtDialog";
+import { useRouter } from "next/router";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -63,6 +64,9 @@ interface ArtistProps {
 }
 
 const Artist = ({ artist }: ArtistProps) => {
+  const router = useRouter();
+  const artistId = router.query?.artist_id;
+
   const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
@@ -77,7 +81,7 @@ const Artist = ({ artist }: ArtistProps) => {
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
   const { data: gallery, isLoading: isLoadingGallery } = useCollection({
-    userId: artist.id,
+    userId: artistId,
     id: selectedCollection?.id,
   });
 
@@ -91,18 +95,18 @@ const Artist = ({ artist }: ArtistProps) => {
   const { getUser: loggedInUser } = useUser();
   const isMyProfile = loggedInUser && loggedInUser.id === artist?.id;
 
-  const onEditProfileSubmit = async (data) => {
+  const onEditProfileSubmit = async (formData) => {
     if (uploadedProfilePic) {
-      data.profilePic = uploadedProfilePic;
+      formData.profilePic = uploadedProfilePic;
     }
     try {
-      const res = await fetch(`/api/users/${artist.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" },
+      const { data } = await axios.patch(`/users/${artist.id}`, formData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${loggedInUser?.accessToken}`,
+        },
       });
-      const resData = await res.json();
-      setUpdatedUser({ ...artist, name: resData.name });
+      setUpdatedUser({ ...artist, name: data.name });
       setInEditMode(false);
     } catch (err) {
       console.error(err);
@@ -296,7 +300,6 @@ const Artist = ({ artist }: ArtistProps) => {
         <Spacer y={1} />
 
         <CollectionList
-          artist={artist}
           selectedCollection={selectedCollection}
           setSelectedCollection={setSelectedCollection}
           openEditDialog={() => setEditDialogOpen(true)}

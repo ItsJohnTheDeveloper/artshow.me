@@ -16,9 +16,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
           where: { userId },
         });
 
-        if (limited) {
-          return res.status(200).json(collections);
-        }
+        return res.status(200).json(collections);
       }
 
       // if "Show all" is the collectionId, return all artwork (all of users art).
