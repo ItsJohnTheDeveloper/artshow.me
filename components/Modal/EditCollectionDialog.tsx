@@ -279,7 +279,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                           const file = e.target.files?.[0];
                           handleUploadPaintingPicture(
                             file,
-                            loggedInUser.id,
+                            loggedInUser,
                             (url: string) => {
                               setNewPainting({
                                 ...newPainting,

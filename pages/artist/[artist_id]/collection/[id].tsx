@@ -37,16 +37,15 @@ export const getServerSideProps: GetServerSideProps = async ({
   return {
     props: {
       data: {
-        painting: JSON.stringify(painting),
-        collection: JSON.stringify(collection),
+        painting: JSON.parse(JSON.stringify(painting)),
+        collection: JSON.parse(JSON.stringify(collection)),
       },
     },
   };
 };
 
 const Collection = (props) => {
-  const painting = JSON.parse(props.data.painting);
-  const collection = JSON.parse(props.data.collection);
+  const { painting, collection } = props.data;
 
   const {
     description,

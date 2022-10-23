@@ -1,12 +1,20 @@
 import axios from "axios";
 
-export const handleUploadProfilePicture = async (file, userId, callback) => {
+export const handleUploadProfilePicture = async (
+  file,
+  loggedInUser,
+  callback
+) => {
   try {
-    let { data } = await axios.post("/s3/uploadFile", {
-      name: file.name,
-      type: file.type,
-      folder: `profile/${userId}`,
-    });
+    let { data } = await axios.post(
+      "/s3/uploadFile",
+      {
+        name: file.name,
+        type: file.type,
+        folder: `profile/${loggedInUser.id}`,
+      },
+      { headers: { Authorization: `Bearer ${loggedInUser.accessToken}` } }
+    );
 
     // finally, upload the file to S3 bucket
     const { url } = data;
@@ -21,16 +29,26 @@ export const handleUploadProfilePicture = async (file, userId, callback) => {
     callback(imageUrl);
   } catch (err) {
     console.log(err?.response?.data);
+    throw err;
   }
 };
 
-export const handleUploadPaintingPicture = async (file, userId, callback) => {
+export const handleUploadPaintingPicture = async (
+  file,
+  loggedInUser,
+  callback
+) => {
+  console.log({ loggedInUser });
   try {
-    let { data } = await axios.post("/s3/uploadFile", {
-      name: file.name,
-      type: file.type,
-      folder: `paintings/${userId}`,
-    });
+    let { data } = await axios.post(
+      "/s3/uploadFile",
+      {
+        name: file.name,
+        type: file.type,
+        folder: `paintings/${loggedInUser.id}`,
+      },
+      { headers: { Authorization: `Bearer ${loggedInUser.accessToken}` } }
+    );
 
     // finally, upload the file to S3 bucket
     const { url } = data;
@@ -45,5 +63,6 @@ export const handleUploadPaintingPicture = async (file, userId, callback) => {
     callback(imageUrl);
   } catch (err) {
     console.log(err?.response?.data);
+    throw err;
   }
 };

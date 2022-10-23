@@ -130,12 +130,16 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
                 setIsUploadingImage(true);
                 handleUploadPaintingPicture(
                   file,
-                  loggedInUser.id,
+                  loggedInUser,
                   (url: string) => {
                     setValue("image", url);
                     setIsUploadingImage(false);
                   }
-                );
+                ).catch((err) => {
+                  setServerMessage(err?.response?.data?.message);
+                  setIsUploadingImage(false);
+                });
+                // TODO: add revalidation to collection data to show newly added image
               }}
             />
             <img

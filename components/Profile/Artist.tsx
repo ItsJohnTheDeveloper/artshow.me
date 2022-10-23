@@ -93,7 +93,7 @@ const Artist = ({ artist }: ArtistProps) => {
   } = useForm();
 
   const { getUser: loggedInUser } = useUser();
-  const isMyProfile = loggedInUser && loggedInUser.id === artist?.id;
+  const isMyProfile = loggedInUser && loggedInUser.id === artistId;
 
   const onEditProfileSubmit = async (formData) => {
     if (uploadedProfilePic) {
@@ -182,7 +182,7 @@ const Artist = ({ artist }: ArtistProps) => {
                   const file = e.target.files?.[0];
                   handleUploadProfilePicture(
                     file,
-                    loggedInUser.id,
+                    loggedInUser,
                     (url: string) => {
                       setUploadedProfilePic(url);
                     }

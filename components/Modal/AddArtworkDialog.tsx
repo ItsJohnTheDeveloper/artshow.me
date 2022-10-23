@@ -207,7 +207,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
                     setIsUploadingImage(true);
                     handleUploadPaintingPicture(
                       file,
-                      loggedInUser.id,
+                      loggedInUser,
                       (url: string) => {
                         setValue("image", url);
                         setIsUploadingImage(false);

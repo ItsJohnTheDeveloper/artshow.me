@@ -60,6 +60,10 @@ export function middleware(request: NextRequest) {
         return isAuthenticated(request);
       }
 
+    // S3 Storage Upload
+    case "/api/s3/uploadFile":
+      return isAuthenticated(request);
+
     // add more protected auth routes here...
 
     default:
