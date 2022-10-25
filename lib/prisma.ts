@@ -1,8 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 
-const printLogs = process.env.NODE_ENV === "production";
+const printLogs = false;
 const config = {
-  log: printLogs ? ["query", "info", "warn", "error"] : [],
+  log: printLogs
+    ? [
+        {
+          emit: "event",
+          level: "query",
+        },
+        {
+          emit: "stdout",
+          level: "error",
+        },
+        {
+          emit: "stdout",
+          level: "info",
+        },
+        {
+          emit: "stdout",
+          level: "warn",
+        },
+      ]
+    : [],
 } as any;
 
 // add prisma to the NodeJS global type
