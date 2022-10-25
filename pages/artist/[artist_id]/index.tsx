@@ -24,14 +24,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 const Artist = (props) => {
   const { artist } = props.data;
 
-  console.log(artist);
-
   return (
     <Layout showCrumbs>
-      artist: {artist.id}
-      <br />
-      id: {artist.id}
-      {/* <ArtistPage artist={artist} /> */}
+      <ArtistPage artist={artist} />
     </Layout>
   );
 };
