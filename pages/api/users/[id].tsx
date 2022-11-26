@@ -8,7 +8,7 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       if (!req.query) {
         return res.status(404).json({ message: "No request query found" });
       }
-      const id = req.query.id as string;
+      const { id } = req.query as any;
 
       try {
         const response: ArtistDocument = await prisma.user.findUnique({
