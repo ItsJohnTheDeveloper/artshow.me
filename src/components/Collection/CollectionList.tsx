@@ -32,7 +32,7 @@ const CollectionList = ({
         position: "sticky",
         top: 81,
         padding: "5px 24px",
-        backgroundColor: "#202225f2",
+        backgroundColor: "#1b2631f2",
       }}
     >
       <div style={{ display: "flex", gap: 6 }}>

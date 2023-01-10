@@ -22,7 +22,7 @@ const useCollection = (params = undefined) => {
 };
 
 const useArtist = (id) => {
-  const url = id && `/users/${id}`;
+  const url = id ? `/users/${id}` : null;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
   return { data, isLoading: url ? !isError && !data : true, isError, mutate };
 };

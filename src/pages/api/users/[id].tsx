@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../lib/prisma";
 import { ArtistDocument } from "../../../models/Artist";
+import { getUser } from "../../../prisma/user";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
@@ -11,10 +12,9 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
       const { id } = req.query as any;
 
       try {
-        const response: ArtistDocument = await prisma.user.findUnique({
-          where: { id },
-        });
-        res.status(200).json(response);
+        const user = await getUser(id);
+
+        res.status(200).json(user);
       } catch (err) {
         res.status(403).json({ message: `An Error occurred: ${err}` });
       }

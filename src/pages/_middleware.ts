@@ -55,10 +55,10 @@ export function middleware(request: NextRequest) {
       return isAuthenticated(request);
 
     // Users
-    case "/api/users/[id]":
-      if (method === "PATCH") {
-        return isAuthenticated(request);
-      }
+    // case "/api/users/[id]":
+    // if (method === "PATCH") {
+    //   return isAuthenticated(request);
+    // }
 
     // S3 Storage Upload
     case "/api/s3/uploadFile":

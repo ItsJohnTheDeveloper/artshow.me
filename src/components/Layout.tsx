@@ -101,7 +101,7 @@ const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
         }
 
         body {
-          background-color: #202225;
+          background-color: #1b2631;
           margin: 0;
           padding: 0;
           font-size: 16px;

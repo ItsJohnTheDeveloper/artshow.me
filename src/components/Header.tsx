@@ -178,7 +178,7 @@ const Header: React.FC = () => {
         position: "sticky",
         zIndex: 100,
         padding: "8px",
-        backgroundColor: "#14171c",
+        backgroundColor: "#193264",
       }}
     >
       <Grid container spacing={3}>
