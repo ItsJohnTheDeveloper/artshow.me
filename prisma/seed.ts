@@ -4,6 +4,8 @@ const prisma = new PrismaClient();
 
 const seed = (nUsers, nPaintings) => {
   // *********USERS
+  // Delete ALL Users (except for my main testing user)
+
   const a = ["Small", "Chirpy", "Ugly", "Blue"];
   const b = ["Hilarious", "Evil", "Pretty", "Godly"];
   const c = ["Bear", "Dog", "Banana", "Tuple"];
