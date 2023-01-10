@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import Layout from "../../../components/Layout";
 import ArtistPage from "../../../components/Profile/Artist";
-import prisma from "../../../lib/prisma";
+import prisma from "../../../../lib/prisma";
 import { ArtistDocument } from "../../../models/Artist";
 import { useArtist } from "../../../utils/hooks/useQueryData";
 

@@ -7,7 +7,7 @@ import { Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import Layout from "../../../../components/Layout";
 import Spacer from "../../../../components/Spacer";
 import ArtPreview from "../../../../components/Collection/Gallery/ArtPreview";
-import prisma from "../../../../lib/prisma";
+import prisma from "../../../../../lib/prisma";
 import GalleryGrid from "../../../../components/Collection/Gallery/GalleryGrid";
 import theme from "../../../../styles/theme";
 
