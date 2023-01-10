@@ -6,8 +6,8 @@ const theme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "#1b2631", // header #1b2631 -> #222222
-      paper: "#193264", // paper #193264 -> #303030
+      default: "#1b2631", // header OLD #212730
+      paper: "#193264", // paper OLD #303339
       // @ts-expect-error
       highContrast: "#99CCFF",
     },

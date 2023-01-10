@@ -6,13 +6,14 @@ import axios from "axios";
 
 import Spacer from "../../Spacer";
 import { generateNewUser } from "../../../schemas/generateNew";
+import theme from "../../../styles/theme";
 
 const modalStyle = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  bgcolor: "#212730",
+  bgcolor: theme.palette.background.default,
   boxShadow: 24,
   borderRadius: 3,
   p: 3,

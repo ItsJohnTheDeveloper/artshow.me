@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
+import theme from "../../styles/theme";
 import Spacer from "../Spacer";
 
 type CreateCollectionForm = {
@@ -40,7 +41,7 @@ const CreateCollectionDialog = ({ open, setOpen, handleOnSubmit }) => {
       fullWidth
       PaperProps={{
         style: {
-          backgroundColor: "#212730",
+          backgroundColor: theme.palette.background.default,
           boxShadow: "24px",
           borderRadius: 12,
           backgroundImage: "unset",

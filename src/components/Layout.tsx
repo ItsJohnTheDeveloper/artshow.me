@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Header from "./Header";
+import theme from "../styles/theme";
 
 const StyledBreadCrumbs = () => {
   const router = useRouter();
@@ -44,12 +45,6 @@ const StyledBreadCrumbs = () => {
   );
 };
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
-
 type LayoutProps = {
   children: React.ReactNode;
   pageSpacing?: boolean;
@@ -58,7 +53,7 @@ type LayoutProps = {
 // bg color: #202225
 const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <Header />
 
       <Grid
@@ -101,7 +96,7 @@ const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
         }
 
         body {
-          background-color: #1b2631;
+          background-color: ${theme.palette.background.default};
           margin: 0;
           padding: 0;
           font-size: 16px;

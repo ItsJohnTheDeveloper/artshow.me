@@ -1,4 +1,5 @@
 import Select from "react-select";
+import theme from "../../styles/theme";
 
 const customStyles = {
   option: (provided) => ({
@@ -12,7 +13,7 @@ const customStyles = {
   }),
   control: (provided) => ({
     ...provided,
-    backgroundColor: "#212730",
+    backgroundColor: theme.palette.background.default,
     borderColor: "#545960",
     minHeight: 56,
   }),
@@ -27,11 +28,11 @@ const ReactSelect = ({ options, ...rest }) => {
     <Select
       styles={customStyles}
       options={options}
-      theme={(theme) => ({
-        ...theme,
+      theme={(Theme) => ({
+        ...Theme,
         colors: {
-          ...theme.colors,
-          primary25: "#212730",
+          ...Theme.colors,
+          primary25: theme.palette.background.default,
           //   primary: "black",
         },
       })}

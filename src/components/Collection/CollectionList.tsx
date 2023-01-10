@@ -5,6 +5,7 @@ import { useUser } from "../../contexts/user-context";
 import Spacer from "../Spacer";
 import { useCollection } from "../../utils/hooks/useQueryData";
 import { useRouter } from "next/router";
+import theme from "../../styles/theme";
 
 const CollectionList = ({
   selectedCollection,
@@ -24,6 +25,7 @@ const CollectionList = ({
 
   const setCollection = (name, id) => {
     setSelectedCollection({ name, id });
+    1;
   };
 
   return (
@@ -32,7 +34,7 @@ const CollectionList = ({
         position: "sticky",
         top: 81,
         padding: "5px 24px",
-        backgroundColor: "#1b2631f2",
+        backgroundColor: theme.palette.background.default + "f2",
       }}
     >
       <div style={{ display: "flex", gap: 6 }}>

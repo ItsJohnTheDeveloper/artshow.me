@@ -4,6 +4,7 @@ import { Paper } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { showAllOption } from "../../../utils/helpers/getDefaultValues";
+import theme from "../../../styles/theme";
 
 const StyledArtImageWrapper = styled("div")({
   height: 290,
@@ -20,7 +21,7 @@ const StyleArtImage = styled("img")({
 });
 
 const StyledArtPaper = styled(Paper)({
-  backgroundColor: "#303339",
+  backgroundColor: theme.palette.background.paper,
   paddingBottom: 12,
   marginBottom: 10,
   borderRadius: 10,

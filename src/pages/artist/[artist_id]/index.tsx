@@ -34,18 +34,15 @@ const Artist = (props) => {
 
   const { data: artist, isLoading } = useArtist(artist_id);
 
-  console.log({ artist, isLoading });
   // const { artist } = props.data;
 
-  if (isLoading) {
-    return <CircularProgress />;
+  if (!isLoading && artist) {
+    artist.coverPic = "/artist/cover.jpg"; // TODO: change later, mock for now
   }
-
-  artist.coverPic = "/artist/cover.jpg"; // TODO: change later, mock for now
 
   return (
     <Layout showCrumbs>
-      <ArtistPage artist={artist} />
+      {isLoading ? <CircularProgress /> : <ArtistPage artist={artist} />}
     </Layout>
   );
 };

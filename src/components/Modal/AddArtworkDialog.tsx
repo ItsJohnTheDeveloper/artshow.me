@@ -20,6 +20,7 @@ import { useUser } from "../../contexts/user-context";
 import ReactSelect from "../Common/ReactSelect";
 import { useCollection } from "../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../Common/ArtDimensionsForm";
+import theme from "../../styles/theme";
 
 type AddArtworkForm = {
   name: string;
@@ -135,7 +136,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
       fullWidth
       PaperProps={{
         style: {
-          backgroundColor: "#212730",
+          backgroundColor: theme.palette.background.default,
           boxShadow: "24px",
           borderRadius: 12,
           backgroundImage: "unset",

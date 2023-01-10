@@ -15,6 +15,7 @@ import { useUser } from "../../../../contexts/user-context";
 import { useArtwork } from "../../../../utils/hooks/useQueryData";
 import Spacer from "../../../Spacer";
 import EditArtForm from "./EditArtForm";
+import theme from "../../../../styles/theme";
 
 const ArtDialog = () => {
   const router = useRouter();
@@ -64,7 +65,7 @@ const ArtDialog = () => {
       scroll="body"
       PaperProps={{
         style: {
-          backgroundColor: "#212730",
+          backgroundColor: theme.palette.background.default,
           boxShadow: "24px",
           borderRadius: 12,
           backgroundImage: "unset",

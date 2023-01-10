@@ -23,6 +23,7 @@ import { useUser } from "../../contexts/user-context";
 import Spacer from "../Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 import { useCollection } from "../../utils/hooks/useQueryData";
+import theme from "../../styles/theme";
 
 const quickSortCollection = (collection: any[], sortBy: any[]) => {
   return (collection || []).sort(
@@ -140,7 +141,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
         style: {
           maxHeight: "100vh",
           margin: 0,
-          backgroundColor: "#212730",
+          backgroundColor: theme.palette.background.default,
           boxShadow: "24px",
           borderRadius: 12,
           backgroundImage: "unset",
@@ -366,7 +367,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
           style: {
             maxHeight: "100vh",
             margin: 0,
-            backgroundColor: "#212730",
+            backgroundColor: theme.palette.background.default,
             boxShadow: "24px",
             borderRadius: 12,
             backgroundImage: "unset",
