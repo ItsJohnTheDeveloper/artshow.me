@@ -1,10 +1,20 @@
 import React from "react";
 import { Grid } from "@mui/material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Header from "./Header";
 import theme from "../styles/theme";
+
+const breadCrumbStyles = {
+  padding: "14px 24px",
+  fontSize: 21,
+  position: "absolute",
+  backgroundColor: theme.palette.background.default + "de",
+  borderRadius: 32,
+  margin: 14,
+  fontWeight: "bold",
+};
 
 const StyledBreadCrumbs = () => {
   const router = useRouter();
@@ -20,7 +30,8 @@ const StyledBreadCrumbs = () => {
   };
 
   return (
-    <div style={{ padding: "32px 12px", fontSize: 21 }}>
+    // @ts-expect-error
+    <div style={breadCrumbStyles}>
       <Link href={links.home}>
         <a
           style={{
@@ -79,6 +90,8 @@ const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
       <style jsx global>{`
         html {
           box-sizing: border-box;
+          margin: 0; // will this fix the initial paint margin???
+          padding: 0;
         }
 
         *,

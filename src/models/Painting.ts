@@ -7,7 +7,7 @@ export interface PaintingDocument extends MongoDocument {
   updatedAt: Date;
   width?: number;
   height?: number;
-  sizeUnit?: string;
+  sizeUnit?: "in" | "cm";
   showPrice: boolean;
   price?: number;
   description?: string;

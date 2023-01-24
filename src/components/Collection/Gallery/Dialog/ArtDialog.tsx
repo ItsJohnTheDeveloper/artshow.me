@@ -16,10 +16,12 @@ import { useArtwork } from "../../../../utils/hooks/useQueryData";
 import Spacer from "../../../Spacer";
 import EditArtForm from "./EditArtForm";
 import theme from "../../../../styles/theme";
+import FullScreenImageViewer from "../../../Modal/FullScreenImageViewer";
 
 const ArtDialog = () => {
   const router = useRouter();
   const artistId = router.query.artist_id;
+  const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
 
   const { artId } = router.query;
   const { data: artwork, mutate: boundMutate, isLoading } = useArtwork(artId);
@@ -111,7 +113,17 @@ const ArtDialog = () => {
             />
           ) : (
             <>
-              <img src={image} style={{ maxWidth: "100%", height: "auto" }} />
+              <FullScreenImageViewer
+                open={fullScreenViewerOpen}
+                setOpen={setFullScreenViewerOpen}
+                image={artwork?.image}
+                details={{ title: artwork?.name }}
+              />
+              <img
+                src={image}
+                style={{ maxWidth: "100%", height: "auto", cursor: "zoom-in" }}
+                onClick={() => setFullScreenViewerOpen(true)}
+              />
               <Spacer y={2} />
               <Typography variant="h3">{name}</Typography>
               <Spacer y={0.5} />

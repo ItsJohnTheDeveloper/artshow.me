@@ -5,8 +5,8 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case "GET":
       try {
-        const userCount = await prisma.user.count();
-        res.status(200).json(userCount);
+        const allUsers = await prisma.user.findMany();
+        res.status(200).json(allUsers);
       } catch (err) {
         res.status(403).json({ message: `An Error occurred: ${err}` });
       }

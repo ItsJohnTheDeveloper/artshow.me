@@ -29,7 +29,6 @@ model Collection {
   name      String   @unique
   userId    String   @unique @db.ObjectId
   published Boolean @default(false)
-  paintings String[] 
   order     String[] @unique @db.ObjectId
 }
 

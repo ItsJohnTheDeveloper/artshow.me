@@ -1,15 +1,21 @@
-import { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
+import { useState } from "react";
 import styled from "@emotion/styled";
-import axios from "axios";
 import { useRouter } from "next/router";
-import { Button, Divider, Grid, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  Paper,
+  Typography,
+} from "@mui/material";
 import Layout from "../../../../components/Layout";
 import Spacer from "../../../../components/Spacer";
 import ArtPreview from "../../../../components/Collection/Gallery/ArtPreview";
-import prisma from "../../../../../lib/prisma";
 import GalleryGrid from "../../../../components/Collection/Gallery/GalleryGrid";
 import theme from "../../../../styles/theme";
+import { useCollectionArt } from "../../../../utils/hooks/useQueryData";
+import FullScreenImageViewer from "../../../../components/Modal/FullScreenImageViewer";
 
 const StyledArtPaper = styled(Paper)({
   backgroundColor: theme.palette.background.paper,
@@ -20,126 +26,94 @@ const StyledArtPaper = styled(Paper)({
   top: 106,
 });
 
-export const getServerSideProps: GetServerSideProps = async ({
-  params,
-  query,
-}) => {
-  const { artId } = query as any;
-  const { collection: collectionName, artist_id } = params as any;
+const Collection = () => {
+  const { id, artId } = useRouter().query;
+  const { data, isLoading, isError } = useCollectionArt(id, artId);
+  const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
 
-  const painting = await prisma.painting.findUnique({
-    where: { id: artId },
-  });
+  const artwork = data?.painting;
+  const otherArtInCollection = data?.other;
+  const collection = data?.collection;
 
-  const collection = await prisma.collection.findUnique({
-    where: { name: collectionName, userId: artist_id },
-  });
+  const formattedSize = `w${artwork?.width} x h${artwork?.height}`;
+  const formattedPrice = new Intl.NumberFormat("en-CA").format(artwork?.price);
 
-  return {
-    props: {
-      data: {
-        painting: JSON.parse(JSON.stringify(painting)),
-        collection: JSON.parse(JSON.stringify(collection)),
-      },
-    },
-  };
-};
-
-const Collection = (props) => {
-  const { painting, collection } = props.data;
-
-  const {
-    description,
-    height,
-    width,
-    sizeUnit,
-    image,
-    name,
-    price,
-    id,
-    showPrice,
-  } = painting;
-
-  const formattedSize = `w${width} x h${height}`;
-  const formattedPrice = new Intl.NumberFormat("en-CA").format(price);
-
-  const [collectionGallery, setCollectionGallery] = useState(null);
-
-  const collectionId = painting?.collectionIds?.[0];
-
-  useEffect(() => {
-    const getInitialCollection = async () => {
-      try {
-        const { data } = await axios.get("/collection/getCollections", {
-          params: { id: collectionId },
-        });
-        setCollectionGallery(data);
-      } catch (err) {
-        console.error(err?.response);
-      }
-    };
-
-    if (!collectionGallery?.length) {
-      getInitialCollection();
-    }
-  }, [painting, collectionGallery]);
+  if (isLoading && !isError) {
+    return (
+      <Layout pageSpacing showCrumbs>
+        <CircularProgress />
+      </Layout>
+    );
+  }
 
   return (
-    <Layout pageSpacing showCrumbs>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={6} lg={6} xl={7}>
-          <img src={image} style={{ width: "100%" }} />
-        </Grid>
+    <>
+      <FullScreenImageViewer
+        open={fullScreenViewerOpen}
+        setOpen={setFullScreenViewerOpen}
+        image={artwork?.image}
+        details={{ title: artwork?.name }}
+      />
+      <Layout pageSpacing showCrumbs>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6} md={6} lg={6} xl={7}>
+            <img
+              src={artwork?.image}
+              style={{ width: "100%", cursor: "zoom-in" }}
+              onClick={() => setFullScreenViewerOpen(true)}
+            />
+          </Grid>
 
-        <Grid item xs={12} sm={6} md={6} lg={6} xl={5}>
-          <StyledArtPaper>
-            <Typography variant="h3">{name}</Typography>
-            <Spacer y={0.5} />
-            <Typography variant="body1">{description}</Typography>
-            {sizeUnit && (
-              <>
-                <Spacer y={0.5} />
-                <Typography sx={{ color: "#d5d5d5" }} variant="body1">
-                  Size: {`${height} x ${width} ${sizeUnit}`}
-                </Typography>
-              </>
-            )}
-            <Spacer y={2} />
-            {showPrice && (
-              <>
-                <Typography variant="h4">${formattedPrice}</Typography>
-                <Spacer y={1} />
-                <Button size="medium" variant="contained">
-                  Buy artwork
-                </Button>
-              </>
-            )}
-          </StyledArtPaper>
+          <Grid item xs={12} sm={6} md={6} lg={6} xl={5}>
+            <StyledArtPaper>
+              <Typography variant="h3">{artwork?.name}</Typography>
+              <Spacer y={0.5} />
+              <Typography variant="body1">{artwork?.description}</Typography>
+              {artwork?.sizeUnit && (
+                <>
+                  <Spacer y={0.5} />
+                  <Typography sx={{ color: "#d5d5d5" }} variant="body1">
+                    Size: {formattedSize}
+                  </Typography>
+                </>
+              )}
+              <Spacer y={2} />
+              {artwork?.showPrice && (
+                <>
+                  <Typography variant="h4">${formattedPrice}</Typography>
+                  <Spacer y={1} />
+                  <Button size="medium" variant="contained">
+                    Buy artwork
+                  </Button>
+                </>
+              )}
+            </StyledArtPaper>
+          </Grid>
         </Grid>
-      </Grid>
-      <Spacer y={8} />
-      <Divider />
-      <Spacer y={4} />
+        <Spacer y={8} />
+        <Divider />
+        <Spacer y={4} />
 
-      <Typography variant="body1">
-        More from
-        <Typography variant="h4" fontStyle={"italic"}>
-          {collection.name}
+        <Typography variant="body1">
+          More from
+          <Typography variant="h4" fontStyle={"italic"}>
+            {collection?.name}
+          </Typography>
         </Typography>
-      </Typography>
-      <GalleryGrid xl={6}>
-        {collectionGallery?.map(
-          (painting) =>
-            id !== painting.id && ( //don't show the current selected painting in collection
-              <ArtPreview
-                key={painting.id}
-                data={painting}
-                collection={collection}
-              />
-            )
-        )}
-      </GalleryGrid>
-    </Layout>
+        <GalleryGrid xl={6}>
+          {otherArtInCollection?.map(
+            (painting) =>
+              id !== painting.id && ( //don't show the current selected painting in collection
+                <ArtPreview
+                  key={painting.id}
+                  data={painting}
+                  collection={collection}
+                />
+              )
+          )}
+        </GalleryGrid>
+      </Layout>
+    </>
   );
 };
 

@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../lib/prisma";
 import { getUser } from "../../../../prisma/user";
-import { ArtistDocument } from "../../../models/Artist";
 
 const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {

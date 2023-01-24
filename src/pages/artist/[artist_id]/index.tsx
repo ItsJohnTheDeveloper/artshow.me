@@ -1,12 +1,11 @@
 import { CircularProgress } from "@mui/material";
-import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import Layout from "../../../components/Layout";
 import ArtistPage from "../../../components/Profile/Artist";
-import prisma from "../../../../lib/prisma";
-import { ArtistDocument } from "../../../models/Artist";
 import { useArtist } from "../../../utils/hooks/useQueryData";
+
+/** TODO!! check back later if Prisma supports this in serverless environment. */
 
 // export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 //   const id = params.artist_id as any;
@@ -29,16 +28,10 @@ import { useArtist } from "../../../utils/hooks/useQueryData";
 //   };
 // };
 
-const Artist = (props) => {
+const Artist = () => {
   const { artist_id } = useRouter().query;
 
   const { data: artist, isLoading } = useArtist(artist_id);
-
-  // const { artist } = props.data;
-
-  if (!isLoading && artist) {
-    artist.coverPic = "/artist/cover.jpg"; // TODO: change later, mock for now
-  }
 
   return (
     <Layout showCrumbs>

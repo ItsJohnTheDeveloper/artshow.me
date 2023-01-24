@@ -12,10 +12,14 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
+import prisma from "../../../../../lib/prisma";
 import { useUser } from "../../../../contexts/user-context";
 import { EditPaintingForm } from "../../../../models/Painting";
 import { handleUploadPaintingPicture } from "../../../../utils/helpers/handleUploadFile";
-import { useCollection } from "../../../../utils/hooks/useQueryData";
+import {
+  useCollection,
+  useColsByPainting,
+} from "../../../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../../../Common/ArtDimensionsForm";
 import ReactSelect from "../../../Common/ReactSelect";
 import Spacer from "../../../Spacer";
@@ -31,6 +35,21 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
     limited: true,
     userId: loggedInUser.id,
   });
+
+  const { data: collectionsPaintingBelongsTo } = useColsByPainting(data?.id);
+
+  // Set the default collections that this painting belongs to.
+  useEffect(() => {
+    if (collectionsPaintingBelongsTo?.length) {
+      setValue(
+        "collections",
+        collectionsPaintingBelongsTo?.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }))
+      );
+    }
+  }, [collectionsPaintingBelongsTo]);
 
   const [showSizeInput, setShowSizeInput] = useState(data.sizeUnit || false);
   const [serverMessage, setServerMessage] = useState(null);
@@ -161,18 +180,6 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
                   value: col.id,
                   label: col.name,
                 }))}
-                defaultValue={() => {
-                  let defaultCollectionIds = [];
-                  usersCollections?.forEach((item) => {
-                    if (data?.collectionIds?.includes(item.id)) {
-                      defaultCollectionIds.push({
-                        value: item.id,
-                        label: item.name,
-                      });
-                    }
-                  });
-                  return defaultCollectionIds;
-                }}
                 default
                 placeholder={"No Collection"}
                 onBlur={onBlur}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button, Collapse, TextField, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { styled } from "@mui/system";
@@ -245,7 +245,7 @@ const Artist = ({ artist }: ArtistProps) => {
               <>
                 <h1>{updatedUser.name}</h1>
                 <Collapse
-                  collapsedSize={artist.bio.length > 250 ? 53 : null}
+                  collapsedSize={artist.bio.length > 100 ? 38 : 20}
                   in={bioOpen}
                   style={{ transformOrigin: "0 0 0" }}
                   timeout={800}

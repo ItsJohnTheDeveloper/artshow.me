@@ -1,37 +1,48 @@
+import { Typography } from "@mui/material";
+import { User } from "@prisma/client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import { useArtwork } from "../utils/hooks/useQueryData";
+import Spacer from "../components/Spacer";
 
 const Home = () => {
-  const [paintingId, setPaintingId] = useState("");
-  const { data: artwork, isLoading, isError } = useArtwork(paintingId);
+  const [allUsers, setAllUsers] = useState([]);
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const users = await fetch("/api/users/getAll").then((res) =>
+          res.json()
+        );
+        setAllUsers(users);
+        return;
+      } catch (err) {
+        console.log("error occurred getting all users: ", err);
+      }
+    };
+    getUsers();
+  }, []);
 
   return (
     <Layout>
-      <div className="page">
-        <main>this page is intentionally blank.</main>
-        <br />
-        <span>
-          <Link href="/artist/6293dca2d671e0ad7d7878ea">
-            view a sample profile
-          </Link>{" "}
-          or create a new account.
-        </span>
-        {/* <br /> <br />
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            setPaintingId("6314045cb51b979324080356");
-          }}
-        >
-          {"fetch sample painting from '/api/painting/6314045cb51b979324080356"}
-        </button>
-        <br /> <br />
-        {isLoading && <h4>Loading...</h4>}
-        {artwork && <div>{artwork.name}</div>}
-        {isError && isError.response.data.message} */}
-      </div>
+      <main className="page">
+        <Spacer y={1} />
+        <Link href="/artist/6293dca2d671e0ad7d7878ea">testing profile</Link>
+
+        <Spacer y={3} />
+
+        <Typography variant="h5">{`Sample Artist Profiles`}</Typography>
+        <ul>
+          {allUsers.map(
+            (user: User) =>
+              user.id !== "6293dca2d671e0ad7d7878ea" && (
+                <li>
+                  <a href={`/artist/${user.id}`}>{user.name}</a>
+                </li>
+              )
+          )}
+        </ul>
+      </main>
     </Layout>
   );
 };

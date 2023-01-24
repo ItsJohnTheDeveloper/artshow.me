@@ -102,7 +102,7 @@ const ArtPreview = ({ data, collection }) => {
         <StyledArtPaper>
           {!showAllSelected ? (
             <Link
-              href={`/artist/${userId}/collection/${collection.name}?artId=${id}`}
+              href={`/artist/${userId}/collection/${collection.id}?artId=${id}`}
             >
               <a style={{ textDecoration: "auto" }}>
                 <StyledArtCard />

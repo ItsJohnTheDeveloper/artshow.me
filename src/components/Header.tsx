@@ -20,6 +20,7 @@ import { Menu, Close, Logout, ContactPage, Search } from "@mui/icons-material";
 import SignUpModal from "./Modal/Auth/SignUpModal";
 import LoginModal from "./Modal/Auth/LoginModal";
 import { useUser } from "../contexts/user-context";
+import theme from "../styles/theme";
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -65,6 +66,7 @@ const Header: React.FC = () => {
             variant="standard"
             size="small"
             fullWidth
+            disabled // TODO: enable search
           />
         </Box>
         <Spacer y={1} />
@@ -178,7 +180,7 @@ const Header: React.FC = () => {
         position: "sticky",
         zIndex: 100,
         padding: "8px",
-        backgroundColor: "#193264",
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <Grid container spacing={3}>
