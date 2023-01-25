@@ -38,6 +38,10 @@ const Collection = () => {
   const formattedSize = `w${artwork?.width} x h${artwork?.height}`;
   const formattedPrice = new Intl.NumberFormat("en-CA").format(artwork?.price);
 
+  const handleOnClickImage = () => {
+    setFullScreenViewerOpen(true);
+  };
+
   if (isLoading && !isError) {
     return (
       <Layout pageSpacing showCrumbs>
@@ -54,13 +58,14 @@ const Collection = () => {
         image={artwork?.image}
         details={{ title: artwork?.name }}
       />
+
       <Layout pageSpacing showCrumbs>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={6} lg={6} xl={7}>
             <img
               src={artwork?.image}
               style={{ width: "100%", cursor: "zoom-in" }}
-              onClick={() => setFullScreenViewerOpen(true)}
+              onClick={handleOnClickImage}
             />
           </Grid>
 

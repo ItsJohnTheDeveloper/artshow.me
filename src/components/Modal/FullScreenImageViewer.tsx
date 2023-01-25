@@ -4,6 +4,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  useMediaQuery,
 } from "@mui/material";
 import theme from "../../styles/theme";
 
@@ -22,10 +23,13 @@ const FullScreenImageViewer = ({
   image,
   details,
 }: FullScreenImageViewerProps) => {
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   const { title } = details;
 
   return (
     <Dialog
+      fullScreen={isMobile}
       fullWidth
       maxWidth={false}
       open={open}
@@ -54,7 +58,19 @@ const FullScreenImageViewer = ({
         }}
       >
         <DialogContent>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle>
+            <div
+              style={{
+                background: "rgba(27,38,49,0.7)",
+                backdropFilter: "blur(10px)",
+                padding: "20px 30px",
+                borderRadius: 28,
+                width: "fit-content",
+              }}
+            >
+              {title}
+            </div>
+          </DialogTitle>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Close</Button>

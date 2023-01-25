@@ -8,6 +8,7 @@ import {
   DialogTitle,
   IconButton,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
@@ -19,6 +20,8 @@ import theme from "../../../../styles/theme";
 import FullScreenImageViewer from "../../../Modal/FullScreenImageViewer";
 
 const ArtDialog = () => {
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   const router = useRouter();
   const artistId = router.query.artist_id;
   const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
@@ -60,8 +63,9 @@ const ArtDialog = () => {
 
   return (
     <Dialog
+      fullScreen={isMobile}
       fullWidth
-      maxWidth="md"
+      maxWidth="lg"
       open
       onClose={handleOnCloseDialog}
       scroll="body"
@@ -71,6 +75,8 @@ const ArtDialog = () => {
           boxShadow: "24px",
           borderRadius: 12,
           backgroundImage: "unset",
+          background: "rgba(27,38,49,0.7)",
+          backdropFilter: "blur(10px)",
         },
       }}
     >
@@ -113,12 +119,14 @@ const ArtDialog = () => {
             />
           ) : (
             <>
-              <FullScreenImageViewer
-                open={fullScreenViewerOpen}
-                setOpen={setFullScreenViewerOpen}
-                image={artwork?.image}
-                details={{ title: artwork?.name }}
-              />
+              {!isMobile && (
+                <FullScreenImageViewer
+                  open={fullScreenViewerOpen}
+                  setOpen={setFullScreenViewerOpen}
+                  image={artwork?.image}
+                  details={{ title: artwork?.name }}
+                />
+              )}
               <img
                 src={image}
                 style={{ maxWidth: "100%", height: "auto", cursor: "zoom-in" }}

@@ -37,7 +37,7 @@ const CollectionList = ({
         backgroundColor: theme.palette.background.default + "f2",
       }}
     >
-      <div style={{ display: "flex", gap: 6 }}>
+      <div style={{ display: "flex", gap: 6, overflow: "overlay" }}>
         <Chip
           size="medium"
           label={showAllOption.name}
