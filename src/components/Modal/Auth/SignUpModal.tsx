@@ -33,8 +33,6 @@ const SignUpModal = ({ open, setOpen }) => {
   } = useForm();
 
   const onSignUpSubmit = async (data: SignUpSubmitForm) => {
-    console.log(data);
-
     const user = generateNewUser(data.name, data.password, data.email);
 
     try {

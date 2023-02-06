@@ -12,12 +12,11 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import prisma from "../../../../../lib/prisma";
 import { useUser } from "../../../../contexts/user-context";
 import { EditPaintingForm } from "../../../../models/Painting";
 import { handleUploadPaintingPicture } from "../../../../utils/helpers/handleUploadFile";
 import {
-  useCollection,
+  useArtistsCollections,
   useColsByPainting,
 } from "../../../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../../../Common/ArtDimensionsForm";
@@ -31,10 +30,7 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
   const { mutate: globalMutate } = useSWRConfig();
   const { getUser: loggedInUser } = useUser();
 
-  const { data: usersCollections } = useCollection({
-    limited: true,
-    userId: loggedInUser.id,
-  });
+  const { data: usersCollections } = useArtistsCollections(loggedInUser?.id);
 
   const { data: collectionsPaintingBelongsTo } = useColsByPainting(data?.id);
 

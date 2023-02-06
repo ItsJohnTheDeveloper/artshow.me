@@ -18,7 +18,7 @@ import axios from "axios";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 import { useUser } from "../../contexts/user-context";
 import ReactSelect from "../Common/ReactSelect";
-import { useCollection } from "../../utils/hooks/useQueryData";
+import { useArtistsCollections } from "../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../Common/ArtDimensionsForm";
 import theme from "../../styles/theme";
 
@@ -59,10 +59,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
   const watchedDescription = watch("description");
   const submitDisabled = !watchedName || !watchedImage || !watchedDescription;
 
-  const { data: usersCollections } = useCollection({
-    limited: true,
-    userId: loggedInUser.id,
-  });
+  const { data: usersCollections } = useArtistsCollections(loggedInUser.id);
 
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadingArtwork, setUploadingArtwork] = useState(false);
@@ -106,7 +103,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
     }
 
     try {
-      await axios.post("/painting/create", paintingObject, {
+      await axios.post("/paintings/create", paintingObject, {
         headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
       });
       globalMutate(

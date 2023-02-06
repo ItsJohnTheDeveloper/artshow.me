@@ -3,7 +3,7 @@ import { Button, Chip } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useUser } from "../../contexts/user-context";
 import Spacer from "../Spacer";
-import { useCollection } from "../../utils/hooks/useQueryData";
+import { useArtistsCollections } from "../../utils/hooks/useQueryData";
 import { useRouter } from "next/router";
 import theme from "../../styles/theme";
 
@@ -18,10 +18,7 @@ const CollectionList = ({
   const { getUser: loggedInUser } = useUser();
   const isMyProfile = loggedInUser && loggedInUser.id === artistId;
 
-  const { data: usersCollections, isLoading } = useCollection({
-    limited: true,
-    userId: artistId,
-  });
+  const { data: usersCollections, isLoading } = useArtistsCollections(artistId);
 
   const setCollection = (name, id) => {
     setSelectedCollection({ name, id });

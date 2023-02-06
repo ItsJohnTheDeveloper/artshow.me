@@ -3,25 +3,32 @@ import useSWR from "swr";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
-const useCollectionArt = (collectionId, artworkId) => {
+const useCollectionArt = (colId, artId) => {
   const url =
-    collectionId &&
-    artworkId &&
-    `/collection/${collectionId}?artId=${artworkId}`;
+    colId &&
+    artId &&
+    `/collections/getUsersCollection?id=${colId}&artId=${artId}`;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
-
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
 const useArtwork = (id) => {
-  const url = id && `/painting/${id}`;
+  const url = id && `/paintings/${id}`;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
-const useCollection = (params = undefined) => {
-  const queryParams = params ? `?${new URLSearchParams(params)}` : "";
-  const url = queryParams && `/collection/getCollections${queryParams}`;
+const useArtistsPaintings = (userId, colId) => {
+  if (!userId) {
+    throw new Error("userId is required for useCollection hook");
+  }
+
+  let url = null;
+  if (colId === "all") {
+    url = `/paintings/user/${userId}`;
+  } else {
+    url = colId && `/paintings/collection/${colId}`;
+  }
   const {
     data,
     error: isError,
@@ -29,6 +36,12 @@ const useCollection = (params = undefined) => {
   } = useSWR(url, fetcher, { revalidateIfStale: true });
 
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
+};
+
+const useArtistsCollections = (id) => {
+  const url = id ? `/collections/user/${id}` : null;
+  const { data, error: isError, mutate } = useSWR(url, fetcher);
+  return { data, isLoading: url ? !isError && !data : true, isError, mutate };
 };
 
 const useArtist = (id) => {
@@ -46,7 +59,8 @@ const useColsByPainting = (id) => {
 export {
   useArtwork,
   useCollectionArt,
-  useCollection,
+  useArtistsPaintings,
+  useArtistsCollections,
   useArtist,
   useColsByPainting,
 };

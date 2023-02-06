@@ -12,7 +12,7 @@ import { Artist } from "../../models/Artist";
 import CollectionList from "../Collection/CollectionList";
 import ArtPreview from "../Collection/Gallery/ArtPreview";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import { useCollection } from "../../utils/hooks/useQueryData";
+import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
 import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
 import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
@@ -71,6 +71,8 @@ const Artist = ({ artist }: ArtistProps) => {
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
   const [selectedCollection, setSelectedCollection] = useState(showAllOption);
+  const showAllSelected = selectedCollection.id === showAllOption.id;
+
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const hiddenFileInputRef = useRef(null);
@@ -80,10 +82,10 @@ const Artist = ({ artist }: ArtistProps) => {
     useState(false);
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
-  const { data: gallery, isLoading: isLoadingGallery } = useCollection({
-    userId: artistId,
-    id: selectedCollection?.id,
-  });
+  const { data: gallery, isLoading: isLoadingGallery } = useArtistsPaintings(
+    artistId,
+    selectedCollection.id
+  );
 
   const {
     register,
@@ -118,7 +120,9 @@ const Artist = ({ artist }: ArtistProps) => {
   };
 
   const onOpenAddArtworkModal = () => {
-    setAddArtworkDialogOpen(true);
+    if (isMyProfile) {
+      setAddArtworkDialogOpen(true);
+    }
   };
 
   const handleCreateCollectionSubmit = async (data) => {
@@ -133,8 +137,6 @@ const Artist = ({ artist }: ArtistProps) => {
       console.error(err);
     }
   };
-
-  const showAllSelected = selectedCollection.id === showAllOption.id;
 
   return (
     <div>

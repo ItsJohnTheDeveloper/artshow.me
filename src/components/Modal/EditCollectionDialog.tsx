@@ -22,7 +22,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useUser } from "../../contexts/user-context";
 import Spacer from "../Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
-import { useCollection } from "../../utils/hooks/useQueryData";
+import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
 import theme from "../../styles/theme";
 
 const quickSortCollection = (collection: any[], sortBy: any[]) => {
@@ -41,10 +41,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     data: collection,
     isLoading: isLoadingCollection,
     mutate,
-  } = useCollection({
-    userId: artistId,
-    id: selectedCollection?.id,
-  });
+  } = useArtistsPaintings(artistId, selectedCollection?.id);
 
   const hiddenFileInputRef = useRef(null);
   const [editMode, setEditMode] = useState("");
@@ -66,7 +63,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
 
     try {
       const { data } = await axios.post(
-        "/painting/create",
+        "/paintings/create",
         fullPaintingObject,
         {
           headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },

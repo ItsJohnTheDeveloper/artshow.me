@@ -11,9 +11,7 @@ const Home = () => {
   useEffect(() => {
     const getUsers = async () => {
       try {
-        const users = await fetch("/api/users/getAll").then((res) =>
-          res.json()
-        );
+        const users = await fetch("/api/users/all").then((res) => res.json());
         setAllUsers(users);
         return;
       } catch (err) {
