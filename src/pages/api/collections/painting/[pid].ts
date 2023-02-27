@@ -8,16 +8,16 @@ const getCollectionsThatPaintingBelongTo = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { pid } = req.query;
+  const pid = req.query.pid as string;
   if (!pid) {
     return res.status(404).json("404 - no painting id found");
   }
-  const painting: Painting = await prisma.painting.findUnique({
+  const painting = await prisma.painting.findUnique({
     where: { id: pid },
   });
 
   const colIds = painting.collectionIds;
-  const response: Collection[] = await prisma.collection.findMany({
+  const response = await prisma.collection.findMany({
     where: { id: { in: colIds } },
   });
 

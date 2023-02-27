@@ -1,70 +1,53 @@
-import { User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../lib/prisma";
 import { apiHandler } from "../../../utils/api";
-
-type UserProfile = Omit<User, "password">;
+import { HandleAuthRequestWithOwnership } from "../auth/authMiddlware";
 
 const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { uid } = req.query;
+  const uid = req.query.uid as string;
   if (!uid) {
     return res.status(404).json("404 - no user id found.");
   }
-  const response: UserProfile = await prisma.user.findUnique({
+  const response = await prisma.user.findUnique({
     where: { id: uid },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      profilePic: true,
-      coverPic: true,
-      bio: true,
-      refreshTokens: true,
-      createdAt: true,
-      updatedAt: true,
-    },
   });
 
-  res.status(200).json(response);
+  return res.status(200).json(response);
 };
 
 const updateUser = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!req.body || !req.query.uid) {
+  const uid = req.query.uid as string;
+  if (!uid || !req.body) {
     return res
       .status(404)
       .json({ message: "no request body or user id found" });
   }
-  const { name, bio, profilePic } = req.body;
 
-  let data;
-  if (name) {
-    data = { ...data, name };
-  }
-  if (bio) {
-    data = { ...data, bio };
-  }
-  if (profilePic) {
-    data = { ...data, profilePic };
-  }
+  await HandleAuthRequestWithOwnership(req, res, {
+    resourceType: "user",
+    field: "id",
+    resourceId: uid,
+    callback: async () => {
+      const { name, bio, profilePic } = req.body;
 
-  const { uid } = req.query;
-  const response: UserProfile = await prisma.user.update({
-    where: { id: uid },
-    data,
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      profilePic: true,
-      coverPic: true,
-      bio: true,
-      refreshTokens: true,
-      createdAt: true,
-      updatedAt: true,
+      let data;
+      if (name) {
+        data = { ...data, name };
+      }
+      if (bio) {
+        data = { ...data, bio };
+      }
+      if (profilePic) {
+        data = { ...data, profilePic };
+      }
+      const response = await prisma.user.update({
+        where: { id: uid },
+        data,
+      });
+
+      return res.status(200).json(response);
     },
   });
-
-  res.status(200).json(response);
 };
 
 export default apiHandler({

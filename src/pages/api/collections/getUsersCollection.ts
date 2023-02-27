@@ -8,16 +8,18 @@ const getUsersCollection = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  if (!req.query) {
+  const id = req.query.id as string;
+  const artId = req.query.artId as string;
+
+  if (!id || !artId) {
     return res.status(404).json({ message: "No request body found" });
   }
-  const { id, artId } = req.query as any;
 
-  const painting: Painting = await prisma.painting.findUnique({
+  const painting = await prisma.painting.findUnique({
     where: { id: artId },
   });
 
-  const collection: Collection = await prisma.collection.findUnique({
+  const collection = await prisma.collection.findUnique({
     where: { id },
   });
 
@@ -25,7 +27,7 @@ const getUsersCollection = async (
     where: { collectionIds: { has: id }, NOT: { id: artId } },
   });
 
-  res.status(200).json({ painting, other, collection });
+  return res.status(200).json({ painting, other, collection });
 };
 
 export default apiHandler({

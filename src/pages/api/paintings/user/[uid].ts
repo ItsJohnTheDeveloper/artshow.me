@@ -7,14 +7,14 @@ const getPaintingsByUser = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { uid } = req.query;
+  const uid = req.query.uid as string;
   if (!uid) {
     return res.status(404).json("404 - no user id found.");
   }
-  const response: Painting[] = await prisma.painting.findMany({
+  const response = await prisma.painting.findMany({
     where: { userId: uid },
   });
-  res.status(200).json(response);
+  return res.status(200).json(response);
 };
 
 export default apiHandler({

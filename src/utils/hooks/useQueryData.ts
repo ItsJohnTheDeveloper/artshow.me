@@ -1,9 +1,10 @@
 import axios from "axios";
 import useSWR from "swr";
+import { User } from "@prisma/client";
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
+const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
-const useCollectionArt = (colId, artId) => {
+const useCollectionArt = (colId: string, artId: string) => {
   const url =
     colId &&
     artId &&
@@ -12,13 +13,13 @@ const useCollectionArt = (colId, artId) => {
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
-const useArtwork = (id) => {
+const useArtwork = (id: string) => {
   const url = id && `/paintings/${id}`;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
-const useArtistsPaintings = (userId, colId) => {
+const useArtistsPaintings = (userId: string, colId: string) => {
   if (!userId) {
     throw new Error("userId is required for useCollection hook");
   }
@@ -38,20 +39,26 @@ const useArtistsPaintings = (userId, colId) => {
   return { data, isLoading: url ? !isError && !data : false, isError, mutate };
 };
 
-const useArtistsCollections = (id) => {
+const useArtistsCollections = (id: string) => {
   const url = id ? `/collections/user/${id}` : null;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
   return { data, isLoading: url ? !isError && !data : true, isError, mutate };
 };
 
-const useArtist = (id) => {
+const useArtist = (id: string) => {
   const url = id ? `/users/${id}` : null;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
-  return { data, isLoading: url ? !isError && !data : true, isError, mutate };
+  const userData: User = data;
+  return {
+    data: userData,
+    isLoading: url ? !isError && !data : true,
+    isError,
+    mutate,
+  };
 };
 
-const useColsByPainting = (id) => {
-  const url = id ? `/collection/getColsByPainting?artId=${id}` : null;
+const useColsByPainting = (id: string) => {
+  const url = id ? `/collections/painting/${id}` : null;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
   return { data, isLoading: url ? !isError && !data : true, isError, mutate };
 };

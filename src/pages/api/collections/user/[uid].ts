@@ -3,16 +3,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../../lib/prisma";
 import { apiHandler } from "../../../../utils/api";
 
-// TODO: add limit/offset
 const getCollectionsByUser = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { uid } = req.query;
+  const uid = req.query.uid as string;
   if (!uid) {
     return res.status(404).json("404 - no user id found");
   }
-  const response: Collection[] = await prisma.collection.findMany({
+  const response = await prisma.collection.findMany({
     where: { userId: uid },
   });
 
