@@ -1,5 +1,7 @@
 import S3 from "aws-sdk/clients/s3";
 import { NextApiRequest, NextApiResponse } from "next";
+import { apiHandler } from "../../../utils/api";
+import { HandleAuthRequest } from "../auth/authMiddlware";
 
 const s3 = new S3({
   region: "us-west-1",
@@ -8,15 +10,8 @@ const s3 = new S3({
   signatureVersion: "v4",
 });
 
-export default async function handle(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
-  try {
+const createFile = async (req: NextApiRequest, res: NextApiResponse) => {
+  await HandleAuthRequest(req, res, async () => {
     let { name, type, folder } = req.body;
 
     if (!name || !type || !folder) {
@@ -30,14 +25,15 @@ export default async function handle(
       ContentType: type,
     };
 
-    const url = await s3.getSignedUrlPromise("putObject", fileParams);
-
-    res.status(200).json({ url });
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ message: err });
-  }
-}
+    try {
+      const url = await s3.getSignedUrlPromise("putObject", fileParams);
+      return res.status(200).json({ url });
+    } catch (err) {
+      console.error(err);
+      return res.status(400).json({ message: err });
+    }
+  });
+};
 
 export const config = {
   api: {
@@ -46,3 +42,7 @@ export const config = {
     },
   },
 };
+
+export default apiHandler({
+  POST: createFile,
+});

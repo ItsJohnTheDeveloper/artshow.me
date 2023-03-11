@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Spacer from "./Spacer";
+import { useSession, signOut, signIn } from "next-auth/react";
 import {
   Box,
   Button,
@@ -17,33 +17,21 @@ import {
   Typography,
 } from "@mui/material";
 import { Menu, Close, Logout, ContactPage, Search } from "@mui/icons-material";
-import SignUpModal from "./Modal/Auth/SignUpModal";
 import LoginModal from "./Modal/Auth/LoginModal";
-import { useUser } from "../contexts/user-context";
+import Spacer from "./Spacer";
 import theme from "../styles/theme";
+
+const disableCenterNav = true;
 
 const Header: React.FC = () => {
   const router = useRouter();
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 
-  const [signUpModalOpen, setSignUpModalOpen] = useState(false);
+  const { data: session } = useSession();
+
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [sideDrawerOpen, setSideDrawerOpen] = useState(false);
-
-  const { getUser: authedUser, logOutUser } = useUser();
-
-  const handleOpenSignUpModal = () => {
-    setSignUpModalOpen(!signUpModalOpen);
-  };
-
-  const handleOpenLoginModal = () => {
-    setLoginModalOpen(!loginModalOpen);
-  };
-
-  const handleLogOut = () => {
-    logOutUser();
-  };
 
   const CenterNav = () => {
     return (
@@ -66,7 +54,6 @@ const Header: React.FC = () => {
             variant="standard"
             size="small"
             fullWidth
-            disabled // TODO: enable search
           />
         </Box>
         <Spacer y={1} />
@@ -74,7 +61,7 @@ const Header: React.FC = () => {
           {["Paintings", "Murals", "Books", "Sculptures", "Collections"].map(
             (item) => (
               <div style={{ paddingRight: 13 }} key={item}>
-                <Link href="/">
+                <Link href="/" legacyBehavior>
                   <a>
                     <Typography variant="caption" display="block">
                       {item}
@@ -101,16 +88,13 @@ const Header: React.FC = () => {
   };
 
   const RightNav = () => {
-    if (!authedUser) {
+    if (!session?.user) {
       return (
         <div style={{ display: "flex", justifyContent: "end" }}>
-          <Button variant="text" onClick={handleOpenLoginModal}>
-            Login
+          <Button variant="text" onClick={() => signIn()}>
+            log in
           </Button>
           <Spacer x={1} />
-          <Button variant="text" onClick={handleOpenSignUpModal}>
-            Sign up
-          </Button>
         </div>
       );
     }
@@ -145,7 +129,7 @@ const Header: React.FC = () => {
                 </ListItemButton>
               </ListItem>
               <Divider />
-              <Link href={`/artist/${authedUser.id}`}>
+              <Link href={`/artist/${session.user.id}`} legacyBehavior>
                 <a style={{ textDecoration: "none" }}>
                   <ListItem key="My Profile" disablePadding>
                     <ListItemButton>
@@ -158,7 +142,7 @@ const Header: React.FC = () => {
                 </a>
               </Link>
               <Divider />
-              <ListItem key="Logout" disablePadding onClick={handleLogOut}>
+              <ListItem key="Logout" disablePadding onClick={() => signOut()}>
                 <ListItemButton>
                   <ListItemIcon>
                     <Logout />
@@ -185,7 +169,7 @@ const Header: React.FC = () => {
     >
       <Grid container spacing={3}>
         <Grid item xs>
-          <Link href="/">
+          <Link href="/" legacyBehavior>
             <a
               className="bold"
               data-active={isActive("/")}
@@ -195,15 +179,16 @@ const Header: React.FC = () => {
             </a>
           </Link>
         </Grid>
-        <Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
-          <CenterNav />
-        </Grid>
+        {!disableCenterNav && (
+          <Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
+            <CenterNav />
+          </Grid>
+        )}
         <Grid item xs>
           <RightNav />
         </Grid>
       </Grid>
 
-      <SignUpModal open={signUpModalOpen} setOpen={setSignUpModalOpen} />
       <LoginModal open={loginModalOpen} setOpen={setLoginModalOpen} />
     </nav>
   );

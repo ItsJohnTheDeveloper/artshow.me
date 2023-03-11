@@ -13,7 +13,7 @@ This is the starter project for the fullstack tutorial with Next.js and Prisma. 
 `npm install prisma --save-dev`
 `npx prisma init`
 
-### Creating tables in remote DB (Not applicable for noSQL)
+### Creating tables in remote DB
 
 `npx prisma db push`
 

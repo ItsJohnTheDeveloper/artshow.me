@@ -6,19 +6,21 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Add, AddAPhoto } from "@mui/icons-material";
 import Spacer from "../Spacer";
-import { useUser } from "../../contexts/user-context";
-import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
-import { Artist } from "../../models/Artist";
-import CollectionList from "../Collection/CollectionList";
-import ArtPreview from "../Collection/Gallery/ArtPreview";
-import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import { useCollection } from "../../utils/hooks/useQueryData";
-import EditCollectionDialog from "../Modal/EditCollectionDialog";
 import GalleryGrid from "../Collection/Gallery/GalleryGrid";
-import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
-import AddArtworkDialog from "../Modal/AddArtworkDialog";
-import ArtDialog from "../Collection/Gallery/Dialog/ArtDialog";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { User } from "@prisma/client";
+import { useSWRConfig } from "swr";
+
+import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
+import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
+import { showAllOption } from "../../utils/helpers/getDefaultValues";
+import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
+import EditCollectionDialog from "../Modal/EditCollectionDialog";
+import ArtDialog from "../Collection/Gallery/Dialog/ArtDialog";
+import ArtPreview from "../Collection/Gallery/ArtPreview";
+import CollectionList from "../Collection/CollectionList";
+import AddArtworkDialog from "../Modal/AddArtworkDialog";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -59,18 +61,18 @@ const StyledProfileInfo = styled("div")({
   textAlign: "center",
 });
 
-interface ArtistProps {
-  artist: Artist;
-}
-
-const Artist = ({ artist }: ArtistProps) => {
+const Artist = ({ artist }: { artist: User }) => {
   const router = useRouter();
-  const artistId = router.query?.artist_id;
+  const artistId = router.query?.artist_id as string;
+
+  const { mutate: globalMutate } = useSWRConfig();
 
   const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
   const [selectedCollection, setSelectedCollection] = useState(showAllOption);
+  const showAllSelected = selectedCollection.id === showAllOption.id;
+
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const hiddenFileInputRef = useRef(null);
@@ -80,10 +82,10 @@ const Artist = ({ artist }: ArtistProps) => {
     useState(false);
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
-  const { data: gallery, isLoading: isLoadingGallery } = useCollection({
-    userId: artistId,
-    id: selectedCollection?.id,
-  });
+  const { data: gallery, isLoading: isLoadingGallery } = useArtistsPaintings(
+    artistId,
+    selectedCollection.id
+  );
 
   const {
     register,
@@ -92,10 +94,13 @@ const Artist = ({ artist }: ArtistProps) => {
     formState: { errors },
   } = useForm();
 
-  const { getUser: loggedInUser } = useUser();
-  const isMyProfile = loggedInUser && loggedInUser.id === artistId;
+  const { data: session } = useSession();
+
+  const isMyProfile = session?.user && session?.user?.id === artistId;
 
   const onEditProfileSubmit = async (formData) => {
+    if (!session) return;
+
     if (uploadedProfilePic) {
       formData.profilePic = uploadedProfilePic;
     }
@@ -103,9 +108,9 @@ const Artist = ({ artist }: ArtistProps) => {
       const { data } = await axios.patch(`/users/${artist.id}`, formData, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${loggedInUser?.accessToken}`,
         },
       });
+      globalMutate(`/users/${artist.id}`, data);
       setUpdatedUser({ ...artist, name: data.name });
       setInEditMode(false);
     } catch (err) {
@@ -118,23 +123,25 @@ const Artist = ({ artist }: ArtistProps) => {
   };
 
   const onOpenAddArtworkModal = () => {
-    setAddArtworkDialogOpen(true);
+    if (isMyProfile) {
+      setAddArtworkDialogOpen(true);
+    }
   };
 
   const handleCreateCollectionSubmit = async (data) => {
-    const newCollectionData = { ...data, userId: artist.id };
+    if (!session) return;
+
+    const newCollectionData = { name: data?.name, userId: artist.id };
     try {
-      await axios.post("/collection/create", newCollectionData, {
-        headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
-      });
+      await axios.post("/collections/create", newCollectionData);
+
+      globalMutate(`/collections/user/${artist.id}`);
       setCreateCollectionDialogOpen(false);
     } catch (err) {
       // TODO: handle error later
       console.error(err);
     }
   };
-
-  const showAllSelected = selectedCollection.id === showAllOption.id;
 
   return (
     <div>
@@ -146,7 +153,8 @@ const Artist = ({ artist }: ArtistProps) => {
         }}
       >
         <StyledCoverWrapper>
-          <StyledCoverImage src={artist.coverPic} />
+          {/* TODO: add a default image here if they don't have one. */}
+          <StyledCoverImage src={artist?.coverPic} />
         </StyledCoverWrapper>
         <div
           style={{
@@ -157,7 +165,7 @@ const Artist = ({ artist }: ArtistProps) => {
         >
           <StyledAvatar
             alt="profilename"
-            src={uploadedProfilePic || artist.profilePic}
+            src={uploadedProfilePic ?? artist?.profilePic ?? artist?.image} // order of precedence is uploaded image (edit), profile pic, google image
             sx={{ width: 128, height: 128 }}
           />
           {inEditMode && (
@@ -180,13 +188,15 @@ const Artist = ({ artist }: ArtistProps) => {
                 style={{ display: "none" }}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  handleUploadProfilePicture(
-                    file,
-                    loggedInUser,
-                    (url: string) => {
-                      setUploadedProfilePic(url);
-                    }
-                  );
+                  try {
+                    handleUploadProfilePicture(
+                      file,
+                      session.user,
+                      (url: string) => {
+                        setUploadedProfilePic(url);
+                      }
+                    );
+                  } catch (err) {}
                 }}
               />
             </>
@@ -264,7 +274,13 @@ const Artist = ({ artist }: ArtistProps) => {
               </>
               {isMyProfile && (
                 <>
-                  <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      padding: 14,
+                    }}
+                  >
                     <Button
                       variant="contained"
                       startIcon={<Add />}

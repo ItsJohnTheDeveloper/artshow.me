@@ -32,7 +32,7 @@ const StyledBreadCrumbs = () => {
   return (
     // @ts-expect-error
     <div style={breadCrumbStyles}>
-      <Link href={links.home}>
+      <Link href={links.home} legacyBehavior>
         <a
           style={{
             textDecoration: "auto",
@@ -45,7 +45,7 @@ const StyledBreadCrumbs = () => {
       {url.includes(links.artist) && !url.includes("collection")
         ? ` / Artist `
         : links.artist && (
-            <Link href={links.artist}>
+            <Link href={links.artist} legacyBehavior>
               <a style={{ textDecoration: "auto", color: "#a7a7ff" }}>
                 / Artist
               </a>

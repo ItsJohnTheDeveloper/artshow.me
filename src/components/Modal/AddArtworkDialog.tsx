@@ -15,12 +15,13 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 import Spacer from "../Spacer";
 import axios from "axios";
+
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
-import { useUser } from "../../contexts/user-context";
 import ReactSelect from "../Common/ReactSelect";
-import { useCollection } from "../../utils/hooks/useQueryData";
+import { useArtistsCollections } from "../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../Common/ArtDimensionsForm";
 import theme from "../../styles/theme";
+import { useSession } from "next-auth/react";
 
 type AddArtworkForm = {
   name: string;
@@ -51,7 +52,8 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
     reset,
   } = methods;
 
-  const { getUser: loggedInUser } = useUser();
+  const { data: session, status } = useSession();
+
   const { mutate: globalMutate } = useSWRConfig();
 
   const watchedName = watch("name");
@@ -59,10 +61,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
   const watchedDescription = watch("description");
   const submitDisabled = !watchedName || !watchedImage || !watchedDescription;
 
-  const { data: usersCollections } = useCollection({
-    limited: true,
-    userId: loggedInUser.id,
-  });
+  const { data: usersCollections } = useArtistsCollections(session?.user.id);
 
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadingArtwork, setUploadingArtwork] = useState(false);
@@ -79,6 +78,8 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
   };
 
   const handleAddArtworkSubmit = async (data: AddArtworkForm) => {
+    if (!session) return;
+
     setUploadingArtwork(true);
 
     const paintingObject = {
@@ -88,7 +89,7 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
       width: null,
       height: null,
       sizeUnit: null,
-      userId: loggedInUser.id,
+      userId: session.user.id,
       collectionIds: [],
     };
 
@@ -106,11 +107,9 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
     }
 
     try {
-      await axios.post("/painting/create", paintingObject, {
-        headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
-      });
+      await axios.post("/paintings/create", paintingObject);
       globalMutate(
-        `/api/collection/getCollections?userId=${loggedInUser.id}&id=all`
+        `/api/collection/getCollections?userId=${session.user.id}&id=all`
       );
 
       // clear the artwork form.
@@ -206,14 +205,19 @@ const AddArtworkDialog = ({ open, setOpen }: AddArtworkDialogProps) => {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     setIsUploadingImage(true);
-                    handleUploadPaintingPicture(
-                      file,
-                      loggedInUser,
-                      (url: string) => {
-                        setValue("image", url);
-                        setIsUploadingImage(false);
-                      }
-                    );
+                    // TODO: handle error
+                    try {
+                      handleUploadPaintingPicture(
+                        file,
+                        session.user,
+                        (url: string) => {
+                          setValue("image", url);
+                          setIsUploadingImage(false);
+                        }
+                      );
+                    } catch (err) {
+                      setIsUploadingImage(false);
+                    }
                   }}
                 />
               </>

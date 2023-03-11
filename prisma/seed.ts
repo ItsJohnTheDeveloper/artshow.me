@@ -3,7 +3,6 @@ import GalleryDataMock from "../src/mock/gallery.json";
 import ProfileDataMock from "../src/mock/profile-pics.json";
 
 const prisma = new PrismaClient();
-const testUserId = "6293dca2d671e0ad7d7878ea";
 
 interface RandomPainting {
   id: string;
@@ -20,7 +19,7 @@ const createMockPainting = (userId: string) => {
 
   const painting: Omit<
     Painting,
-    "id" | "createdAt" | "updatedAt" | "showPrice" | "price"
+    "id" | "createdAt" | "updatedAt" | "showPrice" | "price" | "showSize"
   > = {
     name: `Painting #${ranPainting.id}`,
     description: "Random painting from mock data",
@@ -35,23 +34,9 @@ const createMockPainting = (userId: string) => {
 };
 
 const ClearExistingData = async () => {
-  // Delete ALL Users (except for my main testing user)
-  await prisma.user.deleteMany({ where: { id: { not: testUserId } } });
-  await prisma.painting.deleteMany({
-    where: { userId: { not: testUserId } },
-  });
-  await prisma.collection.deleteMany({
-    where: {
-      userId: { not: testUserId },
-    },
-  });
-  await prisma.painting.updateMany({
-    data: {
-      collectionIds: {
-        set: [],
-      },
-    },
-  });
+  await prisma.user.deleteMany();
+  await prisma.painting.deleteMany();
+  await prisma.collection.deleteMany();
 };
 
 const GenerateTestUsers = async (qty) => {
@@ -79,7 +64,6 @@ const GenerateTestUsers = async (qty) => {
     mockUsers.push({
       email,
       name,
-      password: "password",
       bio: `Sample user #${mockProfile.id}`,
       coverPic: ranPainting.url,
       profilePic: mockProfile.url,
@@ -98,9 +82,7 @@ const GenerateTestUsers = async (qty) => {
 const GenerateTestPaintings = async () => {
   const paintingsPerUser = 21;
   try {
-    const allUsers = await prisma.user.findMany({
-      where: { id: { not: testUserId } },
-    });
+    const allUsers = await prisma.user.findMany();
     return allUsers.forEach(
       async (user) =>
         await prisma.painting.createMany({
@@ -121,9 +103,7 @@ const GenerateTestCollections = async () => {
   });
 
   try {
-    const allUsers = await prisma.user.findMany({
-      where: { id: { not: testUserId } },
-    });
+    const allUsers = await prisma.user.findMany();
     return allUsers.forEach(
       async (user) =>
         await prisma.collection.createMany({
@@ -140,17 +120,11 @@ const GenerateTestCollections = async () => {
 };
 
 const AddUserPaintingToUserCollections = async () => {
-  const allUsers = await prisma.user.findMany({
-    where: { id: { not: testUserId } },
-  });
+  const allUsers = await prisma.user.findMany();
 
-  const allPaintings = await prisma.painting.findMany({
-    where: { userId: { not: testUserId } },
-  });
+  const allPaintings = await prisma.painting.findMany();
 
-  const allCollections = await prisma.collection.findMany({
-    where: { userId: { not: testUserId } },
-  });
+  const allCollections = await prisma.collection.findMany();
 
   allUsers.forEach(async (user) => {
     const userPaintings = allPaintings.filter(

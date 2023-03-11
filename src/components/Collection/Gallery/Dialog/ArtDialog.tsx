@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import { useUser } from "../../../../contexts/user-context";
+import { useSession } from "next-auth/react";
+
 import { useArtwork } from "../../../../utils/hooks/useQueryData";
 import Spacer from "../../../Spacer";
 import EditArtForm from "./EditArtForm";
@@ -26,11 +27,11 @@ const ArtDialog = () => {
   const artistId = router.query.artist_id;
   const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
 
-  const { artId } = router.query;
+  const artId = router.query.artId as string;
   const { data: artwork, mutate: boundMutate, isLoading } = useArtwork(artId);
 
-  const { getUser: loggedInUser } = useUser();
-  const isOwnProfile = loggedInUser && loggedInUser.id === artistId;
+  const { data: session } = useSession();
+  const isOwnProfile = session?.user.id && session?.user.id === artistId;
 
   const [isEditingArt, setIsEditingArt] = useState(false);
 
@@ -53,6 +54,7 @@ const ArtDialog = () => {
     height,
     width,
     sizeUnit,
+    showSize,
     image,
     name,
     price,
@@ -136,7 +138,7 @@ const ArtDialog = () => {
               <Typography variant="h3">{name}</Typography>
               <Spacer y={0.5} />
               <Typography variant="h5">{description}</Typography>
-              {sizeUnit && (
+              {showSize && (
                 <>
                   <Spacer y={0.5} />
                   <Typography sx={{ color: "#d5d5d5" }} variant="body1">

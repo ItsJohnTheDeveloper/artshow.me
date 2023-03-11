@@ -1,19 +1,15 @@
 import React from "react";
 import { AppProps } from "next/app";
 import axios from "axios";
-import { useValidateUser } from "../contexts/user-context";
-
-export const UserContext = React.createContext(null);
+import { SessionProvider } from "next-auth/react";
 
 axios.defaults.baseURL = "/api";
 
-const App = ({ Component, pageProps }: AppProps) => {
-  const { user, setUser } = useValidateUser();
-
+const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
   return (
-    <UserContext.Provider value={{ state: { user }, setUser }}>
+    <SessionProvider session={session}>
       <Component {...pageProps} />
-    </UserContext.Provider>
+    </SessionProvider>
   );
 };
 

@@ -103,6 +103,7 @@ const ArtPreview = ({ data, collection }) => {
           {!showAllSelected ? (
             <Link
               href={`/artist/${userId}/collection/${collection.id}?artId=${id}`}
+              legacyBehavior
             >
               <a style={{ textDecoration: "auto" }}>
                 <StyledArtCard />
