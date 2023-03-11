@@ -17,10 +17,11 @@ import {
   Typography,
 } from "@mui/material";
 import { Menu, Close, Logout, ContactPage, Search } from "@mui/icons-material";
-import SignUpModal from "./Modal/Auth/SignUpModal";
 import LoginModal from "./Modal/Auth/LoginModal";
 import Spacer from "./Spacer";
 import theme from "../styles/theme";
+
+const disableCenterNav = true;
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -29,7 +30,6 @@ const Header: React.FC = () => {
 
   const { data: session } = useSession();
 
-  const [signUpModalOpen, setSignUpModalOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [sideDrawerOpen, setSideDrawerOpen] = useState(false);
 
@@ -54,7 +54,6 @@ const Header: React.FC = () => {
             variant="standard"
             size="small"
             fullWidth
-            disabled // TODO: enable search
           />
         </Box>
         <Spacer y={1} />
@@ -180,15 +179,16 @@ const Header: React.FC = () => {
             </a>
           </Link>
         </Grid>
-        <Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
-          <CenterNav />
-        </Grid>
+        {!disableCenterNav && (
+          <Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
+            <CenterNav />
+          </Grid>
+        )}
         <Grid item xs>
           <RightNav />
         </Grid>
       </Grid>
 
-      <SignUpModal open={signUpModalOpen} setOpen={setSignUpModalOpen} />
       <LoginModal open={loginModalOpen} setOpen={setLoginModalOpen} />
     </nav>
   );

@@ -25,7 +25,6 @@ const updateUser = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await HandleAuthRequestWithOwnership(req, res, {
     resourceType: "user",
-    field: "id",
     resourceId: uid,
     callback: async () => {
       const { name, bio, profilePic } = req.body;

@@ -28,7 +28,10 @@ const StyledArtPaper = styled(Paper)({
 
 const Collection = () => {
   const { id, artId } = useRouter().query;
-  const { data, isLoading, isError } = useCollectionArt(id, artId);
+  const { data, isLoading, isError } = useCollectionArt(
+    id as string,
+    artId as string
+  );
   const [fullScreenViewerOpen, setFullScreenViewerOpen] = useState(false);
 
   const artwork = data?.painting;

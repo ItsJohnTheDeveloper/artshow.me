@@ -49,7 +49,7 @@ model Collection {
   name      String
   userId    String   @db.ObjectId
   published Boolean  @default(false)
-  order     String[] @unique @db.ObjectId
+  order     String[] @default([])
 }
 
 model Painting {

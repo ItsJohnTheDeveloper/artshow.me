@@ -1,11 +1,12 @@
 import React from "react";
 import { Button, Chip } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import { useUser } from "../../contexts/user-context";
+import { useSession } from "next-auth/react";
 import Spacer from "../Spacer";
 import { useArtistsCollections } from "../../utils/hooks/useQueryData";
 import { useRouter } from "next/router";
 import theme from "../../styles/theme";
+import { Collection } from "@prisma/client";
 
 const CollectionList = ({
   selectedCollection,
@@ -13,10 +14,9 @@ const CollectionList = ({
   openEditDialog,
 }) => {
   const router = useRouter();
-  const artistId = router.query?.artist_id;
-
-  const { getUser: loggedInUser } = useUser();
-  const isMyProfile = loggedInUser && loggedInUser.id === artistId;
+  const artistId = router.query?.artist_id as string;
+  const { data: session } = useSession();
+  const isMyProfile = session?.user.id && session?.user.id === artistId;
 
   const { data: usersCollections, isLoading } = useArtistsCollections(artistId);
 
@@ -29,7 +29,7 @@ const CollectionList = ({
     <div
       style={{
         position: "sticky",
-        top: 81,
+        top: 68,
         padding: "5px 24px",
         backgroundColor: theme.palette.background.default + "f2",
       }}
@@ -48,7 +48,7 @@ const CollectionList = ({
         />
         <Spacer y={2} />
         {isLoading && <div>Loading...</div>}
-        {usersCollections?.map((collection, i) => (
+        {usersCollections?.map((collection: Collection, i) => (
           <React.Fragment key={collection.id}>
             <Chip
               size="medium"

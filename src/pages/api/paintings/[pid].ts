@@ -1,4 +1,3 @@
-import { Painting } from "./../../../models/Painting";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../lib/prisma";
 import { apiHandler } from "../../../utils/api";
@@ -31,13 +30,12 @@ const getPainting = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const updatePainting = async (req: NextApiRequest, res: NextApiResponse) => {
   const pid = req.query.pid as string;
-  if (!pid && !req.body) {
+  if (!pid || !req.body) {
     return res.status(404).json("404 - no painting id or data found.");
   }
 
   await HandleAuthRequestWithOwnership(req, res, {
     resourceType: "painting",
-    field: "userId",
     resourceId: pid,
     callback: async () => {
       const result = PaintingSchema.safeParse(req.body);
@@ -65,7 +63,6 @@ const deletePainting = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await HandleAuthRequestWithOwnership(req, res, {
     resourceType: "painting",
-    field: "userId",
     resourceId: pid,
     callback: async () => {
       const response = await prisma.painting.delete({

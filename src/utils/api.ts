@@ -1,4 +1,4 @@
-import createHttpError from "http-errors";
+import createHttpError, { CreateHttpError } from "http-errors";
 
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import { Method } from "axios";
@@ -44,7 +44,10 @@ export function apiHandler(handler: ApiMethodHandlers) {
   };
 }
 
-function errorHandler(err: unknown, res: NextApiResponse<ErrorResponse>) {
+function errorHandler(
+  err: CreateHttpError,
+  res: NextApiResponse<ErrorResponse>
+) {
   // Errors with statusCode >= 500 are should not be exposed
   if (createHttpError.isHttpError(err) && err.expose) {
     // Handle all errors thrown by http-errors module

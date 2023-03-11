@@ -9,10 +9,10 @@ import {
   TextField,
 } from "@mui/material";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import { useUser } from "../../../../contexts/user-context";
 import { EditPaintingForm } from "../../../../models/Painting";
 import { handleUploadPaintingPicture } from "../../../../utils/helpers/handleUploadFile";
 import {
@@ -28,9 +28,9 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
   const { register, control, handleSubmit, setValue, watch } = methods;
 
   const { mutate: globalMutate } = useSWRConfig();
-  const { getUser: loggedInUser } = useUser();
+  const { data: session } = useSession();
 
-  const { data: usersCollections } = useArtistsCollections(loggedInUser?.id);
+  const { data: usersCollections } = useArtistsCollections(session?.user?.id);
 
   const { data: collectionsPaintingBelongsTo } = useColsByPainting(data?.id);
 
@@ -47,7 +47,7 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
     }
   }, [collectionsPaintingBelongsTo]);
 
-  const [showSizeInput, setShowSizeInput] = useState(data.sizeUnit || false);
+  const [showSizeInput, setShowSizeInput] = useState(data?.showSize || false);
   const [serverMessage, setServerMessage] = useState(null);
   const [isUpdatingArtwork, setIsUpdatingArtwork] = useState(false);
   const editContainerRef = useRef(null);
@@ -65,46 +65,50 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
   const handleOnSubmit = async (formData: EditPaintingForm) => {
     setIsUpdatingArtwork(true);
 
-    const updatedPaintingObj = {
-      name: formData.name,
-      description: formData.description,
-      image: data?.image,
-      width: null,
-      height: null,
-      sizeUnit: null,
-      collectionIds: [],
-    };
-
-    if (formData?.image) {
-      updatedPaintingObj.image = formData.image;
+    interface PaintingUpdate {
+      name?: string;
+      description?: string;
+      image?: string;
+      width?: number;
+      height?: number;
+      sizeUnit?: string;
+      showSize?: boolean;
+      collectionIds?: string[];
     }
 
-    // TODO: handle formatting size in backend
-    if (
-      showSizeInput &&
-      formData?.sizeUnit &&
-      formData?.width &&
-      formData?.height
-    ) {
-      updatedPaintingObj.width = Number(formData.width);
-      updatedPaintingObj.height = Number(formData.height);
-      updatedPaintingObj.sizeUnit = formData.sizeUnit;
+    let painting: PaintingUpdate = {
+      showSize: showSizeInput,
+    };
+
+    if (formData?.name) {
+      painting.name = formData.name;
+    }
+    if (formData?.description) {
+      painting.description = formData.description;
+    }
+    if (formData?.image) {
+      painting.image = formData.image;
+    }
+    if (formData?.sizeUnit && formData?.width && formData?.height) {
+      painting.width = Number(formData.width);
+      painting.height = Number(formData.height);
+      painting.sizeUnit = formData.sizeUnit;
+    }
+    if (formData?.sizeUnit) {
+      painting.sizeUnit = formData.sizeUnit;
     }
 
     if (formData?.collections) {
       const collectionList = formData.collections.map(
         (collection) => collection.value
       );
-      updatedPaintingObj.collectionIds = collectionList;
+      painting.collectionIds = collectionList;
     }
 
     try {
       const { data: resData } = await axios.patch(
-        `/painting/update?id=${data.id}`,
-        { data: updatedPaintingObj },
-        {
-          headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
-        }
+        `/paintings/${data.id}`,
+        painting
       );
       boundMutate(resData);
       setServerMessage("Artwork updated successfully");
@@ -143,18 +147,20 @@ const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 setIsUploadingImage(true);
-                handleUploadPaintingPicture(
-                  file,
-                  loggedInUser,
-                  (url: string) => {
-                    setValue("image", url);
-                    setIsUploadingImage(false);
-                  }
-                ).catch((err) => {
+                try {
+                  handleUploadPaintingPicture(
+                    file,
+                    session.user,
+                    (url: string) => {
+                      setValue("image", url);
+                      setIsUploadingImage(false);
+                    }
+                  );
+                  // TODO: add revalidation to collection data to show newly added image
+                } catch (err) {
                   setServerMessage(err?.response?.data?.message);
                   setIsUploadingImage(false);
-                });
-                // TODO: add revalidation to collection data to show newly added image
+                }
               }}
             />
             <img

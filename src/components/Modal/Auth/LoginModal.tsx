@@ -1,19 +1,10 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Box, Button, Modal, Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import { Close } from "@mui/icons-material";
-import axios from "axios";
+import { useSession, signIn } from "next-auth/react";
 
 import Spacer from "../../Spacer";
-import { useState } from "react";
-import { useUser } from "../../../contexts/user-context";
+import { useEffect } from "react";
 import theme from "../../../styles/theme";
 
 const modalStyle = {
@@ -27,42 +18,14 @@ const modalStyle = {
   p: 3,
 };
 
-type LoginSubmitForm = {
-  email: string;
-  password: string;
-};
-
 const LoginModal = ({ open, setOpen }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { data: session } = useSession();
 
-  const { setUser } = useUser();
-
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const onLoginSubmit = async (data: LoginSubmitForm) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post("/auth/login", data);
-      console.log(response);
-      console.log(`Successfully logged in!`);
-
-      setUser(response.data);
-
+  useEffect(() => {
+    if (session) {
       setOpen(false);
-    } catch (err) {
-      setIsLoading(false);
-      if (err?.response?.status === 403) {
-        setError("Invalid login credentials.");
-      }
-      console.error(err);
     }
-    setIsLoading(false);
-  };
+  }, [session]);
 
   return (
     <Modal
@@ -82,47 +45,15 @@ const LoginModal = ({ open, setOpen }) => {
           Login
         </Typography>
         <Spacer y={6} />
-        <form onSubmit={handleSubmit(onLoginSubmit)}>
-          <TextField
-            fullWidth
-            id="outlined-basic"
-            label="Email"
-            variant="outlined"
-            {...register("email", { required: true })}
-          />
-          {errors.email && (
-            <Typography variant="body1" color={"#c33333"}>
-              Email address required
+        {!session && (
+          <>
+            <Typography variant="body1">
+              <Button variant="contained" onClick={() => signIn()}>
+                Login
+              </Button>
             </Typography>
-          )}
-          <Spacer y={2} />
-          <TextField
-            fullWidth
-            id="outlined-basic"
-            label="Password"
-            type={"password"}
-            variant="outlined"
-            {...register("password", { required: true })}
-          />
-          {errors.password && (
-            <Typography variant="body1" color={"#c33333"}>
-              Password required
-            </Typography>
-          )}
-          <Spacer y={2} />
-          <Button variant="contained" type={"submit"}>
-            {isLoading ? (
-              <CircularProgress color="success" size={20} />
-            ) : (
-              "Login"
-            )}
-          </Button>
-          {error && (
-            <Typography variant="body1" color={"#c33333"}>
-              {error}
-            </Typography>
-          )}
-        </form>
+          </>
+        )}
       </Box>
     </Modal>
   );

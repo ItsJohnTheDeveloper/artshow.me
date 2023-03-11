@@ -24,12 +24,8 @@ const Home = () => {
   return (
     <Layout>
       <main className="page">
-        <Spacer y={1} />
-        <Link href="/artist/6293dca2d671e0ad7d7878ea">testing profile</Link>
-
-        <Spacer y={3} />
-
-        <Typography variant="h5">{`Sample Artist Profiles`}</Typography>
+        <Spacer y={2} />
+        <Typography variant="h5">{`Artist Profiles`}</Typography>
         <ul>
           {allUsers.map(
             (user: User) =>

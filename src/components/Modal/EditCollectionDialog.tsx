@@ -19,7 +19,8 @@ import {
 import axios from "axios";
 import { useRouter } from "next/router";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useUser } from "../../contexts/user-context";
+import { useSession } from "next-auth/react";
+
 import Spacer from "../Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
@@ -33,10 +34,9 @@ const quickSortCollection = (collection: any[], sortBy: any[]) => {
 
 const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
   const router = useRouter();
-  const artistId = router.query.artist_id;
+  const artistId = router.query.artist_id as string;
 
-  const { getUser: loggedInUser } = useUser();
-
+  const { data: session } = useSession();
   const {
     data: collection,
     isLoading: isLoadingCollection,
@@ -45,6 +45,7 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
 
   const hiddenFileInputRef = useRef(null);
   const [editMode, setEditMode] = useState("");
+  const [paintingToEdit, setPaintingToEdit] = useState(null);
   const [addingNewPainting, setAddingNewPainting] = useState(false);
   const [newPainting, setNewPainting] = useState(null);
 
@@ -58,16 +59,13 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
       width: 123,
       height: 123,
       collectionIds: [selectedCollection.id],
-      userId: loggedInUser.id,
+      userId: session?.user.id,
     };
 
     try {
       const { data } = await axios.post(
         "/paintings/create",
-        fullPaintingObject,
-        {
-          headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
-        }
+        fullPaintingObject
       );
       // revalidate cache with newly created painting
       mutate([...collection, data]);
@@ -105,14 +103,9 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
 
   const handleOnCollectionSave = async () => {
     try {
-      await axios.patch(
-        "/collection/updateCollectionOrder",
-        {
-          id: selectedCollection.id,
-          order: editedCollectionOrder,
-        },
-        { headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` } }
-      );
+      await axios.patch(`/collections/${selectedCollection.id}`, {
+        order: editedCollectionOrder,
+      });
       setOpen(false);
     } catch (err) {
       console.error(err);
@@ -123,12 +116,22 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
     try {
       await axios.delete("/collection/delete", {
         data: { id: selectedCollection.id },
-        headers: { Authorization: `Bearer ${loggedInUser?.accessToken}` },
       });
       setOpen(false);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleOnPaintingEdit = async () => {
+    try {
+      await axios.patch(`/paintings/${editMode}`, paintingToEdit);
+      setPaintingToEdit(null);
+      setEditMode("");
+
+      // revalidate cache with new edited painting
+      mutate();
+    } catch (err) {}
   };
 
   return (
@@ -163,8 +166,8 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Here you can add, edit, remove, or change the order of your
-              painting by dragging and dropping them.
+              You can add, edit, remove, or change the order of your painting by
+              dragging and dropping them.
             </DialogContentText>
             <List component="div">
               <DragDropContext onDragEnd={onDragEnd}>
@@ -195,21 +198,29 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                                 <TextField
                                   id="outlined-title"
                                   label="Title"
-                                  value={painting.name}
-                                  onChange={() => {}}
+                                  defaultValue={painting.name}
+                                  onChange={({ target: { value } }) =>
+                                    setPaintingToEdit({
+                                      ...paintingToEdit,
+                                      name: value,
+                                    })
+                                  }
                                 />
                                 <Spacer y={1} />
                                 <TextField
                                   id="outlined-description"
                                   label="Description"
-                                  value={painting.description}
-                                  onChange={() => {}}
+                                  defaultValue={painting.description}
+                                  onChange={({ target: { value } }) =>
+                                    setPaintingToEdit({
+                                      ...paintingToEdit,
+                                      description: value,
+                                    })
+                                  }
                                 />
                               </div>
                               <div style={{ right: 0, position: "absolute" }}>
-                                <Button
-                                  onClick={() => setEditMode(painting.id)}
-                                >
+                                <Button onClick={handleOnPaintingEdit}>
                                   save
                                 </Button>
                                 <Button onClick={() => setEditMode("")}>
@@ -275,16 +286,18 @@ const EditCollectionDialog = ({ selectedCollection, open, setOpen }) => {
                         style={{ display: "none" }}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
-                          handleUploadPaintingPicture(
-                            file,
-                            loggedInUser,
-                            (url: string) => {
-                              setNewPainting({
-                                ...newPainting,
-                                image: url,
-                              });
-                            }
-                          );
+                          try {
+                            handleUploadPaintingPicture(
+                              file,
+                              session.user,
+                              (url: string) => {
+                                setNewPainting({
+                                  ...newPainting,
+                                  image: url,
+                                });
+                              }
+                            );
+                          } catch (err) {}
                         }}
                       />
                     </>

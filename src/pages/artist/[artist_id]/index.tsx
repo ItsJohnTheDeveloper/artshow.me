@@ -28,14 +28,21 @@ import { useArtist } from "../../../utils/hooks/useQueryData";
 //   };
 // };
 
-const Artist = () => {
-  const { artist_id } = useRouter().query;
+const LoadingIndicator = () => (
+  <div style={{ textAlign: "center", padding: "100px 24px" }}>
+    <CircularProgress />
+  </div>
+);
 
-  const { data: artist, isLoading } = useArtist(artist_id);
+const Artist = () => {
+  const router = useRouter();
+  const artistId = router.query?.artist_id as string;
+
+  const { data: artist, isLoading } = useArtist(artistId);
 
   return (
     <Layout showCrumbs>
-      {isLoading ? <CircularProgress /> : <ArtistPage artist={artist} />}
+      {isLoading ? <LoadingIndicator /> : <ArtistPage artist={artist} />}
     </Layout>
   );
 };

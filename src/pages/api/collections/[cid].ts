@@ -32,7 +32,6 @@ const updateCollection = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await HandleAuthRequestWithOwnership(req, res, {
     resourceType: "collection",
-    field: "userId",
     resourceId: cid,
     callback: async () => {
       let data: CollectionUpdate;
@@ -41,7 +40,7 @@ const updateCollection = async (req: NextApiRequest, res: NextApiResponse) => {
         data = { ...data, name };
       }
       if (order) {
-        data = { ...data, order: JSON.parse(order) };
+        data = { ...data, order };
       }
       const response = await prisma.collection.update({
         where: { id: cid },
@@ -60,7 +59,6 @@ const deleteCollection = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await HandleAuthRequestWithOwnership(req, res, {
     resourceType: "collection",
-    field: "userId",
     resourceId: cid,
     callback: async () => {
       const response = await prisma.collection.delete({
