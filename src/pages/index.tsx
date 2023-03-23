@@ -1,6 +1,5 @@
 import { Typography } from "@mui/material";
 import { User } from "@prisma/client";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import Spacer from "../components/Spacer";
@@ -25,7 +24,9 @@ const Home = () => {
     <Layout>
       <main className="page">
         <Spacer y={2} />
-        <Typography variant="h5">{`Artist Profiles`}</Typography>
+        <Typography variant="h5">
+          {"Artist Profiles (current profiles)"}
+        </Typography>
         <ul>
           {allUsers.map(
             (user: User) =>
