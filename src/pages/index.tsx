@@ -25,7 +25,9 @@ const Home = () => {
     <Layout>
       <main className="page">
         <Spacer y={2} />
-        <Typography variant="h5">{`Artist Profiles`}</Typography>
+        <Typography variant="h5">
+          {"Artist Profiles (current profiles)"}
+        </Typography>
         <ul>
           {allUsers.map(
             (user: User) =>
