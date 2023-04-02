@@ -104,7 +104,7 @@ const ArtDialog = () => {
           <Close />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent style={{ padding: 0 }}>
         <Box
           component="section"
           sx={{
