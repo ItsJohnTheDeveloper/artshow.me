@@ -275,7 +275,7 @@ const Artist = ({ artist }: { artist: User }) => {
                   fullWidth
                   label="Name"
                   variant="outlined"
-                  defaultValue={artist.name}
+                  defaultValue={updatedUser.name}
                   {...register("name", { required: true })}
                 />
                 <Spacer y={2} />
@@ -285,7 +285,7 @@ const Artist = ({ artist }: { artist: User }) => {
                   maxRows={7}
                   label="Bio"
                   variant="outlined"
-                  defaultValue={artist.bio}
+                  defaultValue={updatedUser.bio}
                   {...register("bio")}
                 />
               </form>
@@ -296,9 +296,10 @@ const Artist = ({ artist }: { artist: User }) => {
                 <h1>{updatedUser.name}</h1>
                 <Collapse
                   collapsedSize={
-                    artist.bio.length > 100 || artist.bio.includes("\n")
+                    updatedUser.bio.length > 100 ||
+                    updatedUser.bio.includes("\n")
                       ? 30
-                      : artist.bio.length
+                      : updatedUser.bio.length
                   }
                   in={bioOpen}
                   style={{ transformOrigin: "0 0 0" }}
@@ -312,7 +313,8 @@ const Artist = ({ artist }: { artist: User }) => {
                     {updatedUser.bio}
                   </Typography>
                 </Collapse>
-                {(artist.bio.length > 250 || artist.bio.includes("\n")) && (
+                {(updatedUser.bio.length > 250 ||
+                  updatedUser.bio.includes("\n")) && (
                   <div
                     style={{ cursor: "pointer", marginTop: 10 }}
                     onClick={() => setBioOpen(!bioOpen)}
