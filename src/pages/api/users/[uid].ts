@@ -27,7 +27,7 @@ const updateUser = async (req: NextApiRequest, res: NextApiResponse) => {
     resourceType: "user",
     resourceId: uid,
     callback: async () => {
-      const { name, bio, profilePic } = req.body;
+      const { name, bio, profilePic, coverPic } = req.body;
 
       let data;
       if (name) {
@@ -38,6 +38,9 @@ const updateUser = async (req: NextApiRequest, res: NextApiResponse) => {
       }
       if (profilePic) {
         data = { ...data, profilePic };
+      }
+      if (coverPic) {
+        data = { ...data, coverPic };
       }
       const response = await prisma.user.update({
         where: { id: uid },

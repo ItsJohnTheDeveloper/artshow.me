@@ -7,7 +7,6 @@ import Head from "next/head";
 import { User } from "@prisma/client";
 
 const Artist = (props) => {
-  console.log(props);
   const artist = props.data.artist as User;
 
   // Create a truncated version of the bio for the meta description
@@ -17,7 +16,7 @@ const Artist = (props) => {
   return (
     <Layout showCrumbs>
       <Head>
-        <title>{artist.name} / Art Gallery App</title>
+        <title>{`${artist.name} / Art Gallery App`}</title>
         <meta
           name="description"
           content={`Artist: ${artist.name} - ${seoBio}`}
@@ -51,6 +50,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         artist: JSON.parse(JSON.stringify(artist)),
       },
     },
+    revalidate: 5,
   };
 };
 

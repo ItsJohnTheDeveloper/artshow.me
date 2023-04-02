@@ -115,7 +115,7 @@ const Collection = () => {
                 <ArtPreview
                   key={painting.id}
                   data={painting}
-                  collection={collection}
+                  collectionId={collection.id}
                 />
               )
           )}

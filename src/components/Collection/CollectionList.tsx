@@ -9,8 +9,8 @@ import theme from "../../styles/theme";
 import { Collection } from "@prisma/client";
 
 const CollectionList = ({
-  selectedCollection,
-  setSelectedCollection,
+  selectedCollectionId,
+  setSelectedCollectionId,
   openEditDialog,
 }) => {
   const router = useRouter();
@@ -19,11 +19,6 @@ const CollectionList = ({
   const isMyProfile = session?.user.id && session?.user.id === artistId;
 
   const { data: usersCollections, isLoading } = useArtistsCollections(artistId);
-
-  const setCollection = (name, id) => {
-    setSelectedCollection({ name, id });
-    1;
-  };
 
   return (
     <div
@@ -39,11 +34,9 @@ const CollectionList = ({
           size="medium"
           label={showAllOption.name}
           variant={
-            selectedCollection?.name === showAllOption.name
-              ? "filled"
-              : "outlined"
+            selectedCollectionId === showAllOption.id ? "filled" : "outlined"
           }
-          onClick={() => setCollection(showAllOption.name, showAllOption.id)}
+          onClick={() => setSelectedCollectionId(showAllOption.id)}
           style={{ fontSize: 16, height: 39 }}
         />
         <Spacer y={2} />
@@ -55,20 +48,16 @@ const CollectionList = ({
               key={i}
               label={collection.name}
               variant={
-                selectedCollection?.name === collection.name
-                  ? "filled"
-                  : "outlined"
+                selectedCollectionId === collection.id ? "filled" : "outlined"
               }
-              onClick={(e) => {
-                setCollection(e.currentTarget.innerText, collection.id);
-              }}
+              onClick={() => setSelectedCollectionId(collection.id)}
               style={{ fontSize: 16, height: 39 }}
             />
           </React.Fragment>
         ))}
       </div>
 
-      {isMyProfile && selectedCollection?.id !== "all" && (
+      {isMyProfile && selectedCollectionId !== showAllOption.id && (
         <Button size="small" onClick={openEditDialog} style={{ marginTop: 12 }}>
           Edit this Collection
         </Button>

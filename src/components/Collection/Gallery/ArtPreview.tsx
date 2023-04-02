@@ -56,14 +56,14 @@ const StyledColumnLeft = styled("div")({
   paddingLeft: 2,
 });
 
-const ArtPreview = ({ data, collection }) => {
+const ArtPreview = ({ data, collectionId }) => {
   const router = useRouter();
   const { id, image, name, price, height, width, sizeUnit, userId, showPrice } =
     data;
 
   const priceFormatted = new Intl.NumberFormat("en-CA").format(price);
 
-  const showAllSelected = collection?.name === showAllOption.name;
+  const showAllSelected = collectionId === showAllOption.id;
 
   const StyledArtCard = ({ ...props }) => (
     <div {...props}>
@@ -102,7 +102,7 @@ const ArtPreview = ({ data, collection }) => {
         <StyledArtPaper>
           {!showAllSelected ? (
             <Link
-              href={`/artist/${userId}/collection/${collection.id}?artId=${id}`}
+              href={`/artist/${userId}/collection/${collectionId}?artId=${id}`}
               legacyBehavior
             >
               <a style={{ textDecoration: "auto" }}>

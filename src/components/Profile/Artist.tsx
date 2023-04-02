@@ -12,7 +12,10 @@ import { useSession } from "next-auth/react";
 import { User } from "@prisma/client";
 import { useSWRConfig } from "swr";
 
-import { handleUploadProfilePicture } from "../../utils/helpers/handleUploadFile";
+import {
+  handleUploadCoverPicture,
+  handleUploadProfilePicture,
+} from "../../utils/helpers/handleUploadFile";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
@@ -61,6 +64,23 @@ const StyledProfileInfo = styled("div")({
   textAlign: "center",
 });
 
+const FileImageInputComponent = ({ onChange, reference, styles }) => (
+  <>
+    <AddAPhoto
+      style={styles}
+      onClick={() => {
+        reference.current.click();
+      }}
+    />
+    <input
+      type={"file"}
+      ref={reference}
+      style={{ display: "none" }}
+      onChange={onChange}
+    />
+  </>
+);
+
 const Artist = ({ artist }: { artist: User }) => {
   const router = useRouter();
   const artistId = router.query?.artist_id as string;
@@ -70,13 +90,18 @@ const Artist = ({ artist }: { artist: User }) => {
   const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
-  const [selectedCollection, setSelectedCollection] = useState(showAllOption);
-  const showAllSelected = selectedCollection.id === showAllOption.id;
+  const [selectedCollectionId, setSelectedCollectionId] = useState(
+    // TODO: change to artist's default collection
+    showAllOption.id
+  );
+  const showAllSelected = selectedCollectionId === showAllOption.id;
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const hiddenFileInputRef = useRef(null);
+  const hiddenProfilePicFileRef = useRef(null);
+  const hiddenCoverPicFileRef = useRef(null);
   const [uploadedProfilePic, setUploadedProfilePic] = useState(null);
+  const [uploadedCoverPic, setUploadedCoverPic] = useState(null);
 
   const [createCollectionDialogOpen, setCreateCollectionDialogOpen] =
     useState(false);
@@ -84,7 +109,7 @@ const Artist = ({ artist }: { artist: User }) => {
 
   const { data: gallery, isLoading: isLoadingGallery } = useArtistsPaintings(
     artistId,
-    selectedCollection.id
+    selectedCollectionId
   );
 
   const {
@@ -104,6 +129,9 @@ const Artist = ({ artist }: { artist: User }) => {
     if (uploadedProfilePic) {
       formData.profilePic = uploadedProfilePic;
     }
+    if (uploadedCoverPic) {
+      formData.coverPic = uploadedCoverPic;
+    }
     try {
       const { data } = await axios.patch(`/users/${artist.id}`, formData, {
         headers: {
@@ -111,7 +139,7 @@ const Artist = ({ artist }: { artist: User }) => {
         },
       });
       globalMutate(`/users/${artist.id}`, data);
-      setUpdatedUser({ ...artist, name: data.name });
+      setUpdatedUser({ ...artist, name: data.name, bio: data.bio });
       setInEditMode(false);
     } catch (err) {
       console.error(err);
@@ -144,7 +172,7 @@ const Artist = ({ artist }: { artist: User }) => {
   };
 
   return (
-    <div>
+    <main>
       <div
         style={{
           backgroundColor: inEditMode ? "unset" : "unset",
@@ -154,8 +182,28 @@ const Artist = ({ artist }: { artist: User }) => {
       >
         <StyledCoverWrapper>
           {/* TODO: add a default image here if they don't have one. */}
-          <StyledCoverImage src={artist?.coverPic} />
+          <StyledCoverImage src={uploadedCoverPic ?? artist?.coverPic} />
         </StyledCoverWrapper>
+        {inEditMode && (
+          <FileImageInputComponent
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              try {
+                handleUploadCoverPicture(file, session.user, (url: string) => {
+                  setUploadedCoverPic(url);
+                });
+              } catch (err) {}
+            }}
+            reference={hiddenCoverPicFileRef}
+            styles={{
+              position: "relative",
+              float: "right",
+              bottom: 26,
+              right: 4,
+              cursor: "pointer",
+            }}
+          />
+        )}
         <div
           style={{
             display: "flex",
@@ -170,37 +218,28 @@ const Artist = ({ artist }: { artist: User }) => {
             sx={{ width: 128, height: 128 }}
           />
           {inEditMode && (
-            <>
-              <AddAPhoto
-                style={{
-                  position: "relative",
-                  bottom: 27,
-                  right: -43,
-                  marginBottom: -10,
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  hiddenFileInputRef.current.click();
-                }}
-              />
-              <input
-                type={"file"}
-                ref={hiddenFileInputRef}
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  try {
-                    handleUploadProfilePicture(
-                      file,
-                      session.user,
-                      (url: string) => {
-                        setUploadedProfilePic(url);
-                      }
-                    );
-                  } catch (err) {}
-                }}
-              />
-            </>
+            <FileImageInputComponent
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                try {
+                  handleUploadProfilePicture(
+                    file,
+                    session.user,
+                    (url: string) => {
+                      setUploadedProfilePic(url);
+                    }
+                  );
+                } catch (err) {}
+              }}
+              reference={hiddenProfilePicFileRef}
+              styles={{
+                position: "relative",
+                bottom: 27,
+                right: -43,
+                marginBottom: -10,
+                cursor: "pointer",
+              }}
+            />
           )}
         </div>
         <StyledProfileWrapper>
@@ -256,14 +295,24 @@ const Artist = ({ artist }: { artist: User }) => {
               <>
                 <h1>{updatedUser.name}</h1>
                 <Collapse
-                  collapsedSize={artist.bio.length > 100 ? 38 : 20}
+                  collapsedSize={
+                    artist.bio.length > 100 || artist.bio.includes("\n")
+                      ? 30
+                      : artist.bio.length
+                  }
                   in={bioOpen}
                   style={{ transformOrigin: "0 0 0" }}
                   timeout={800}
                 >
-                  <div style={{ color: "#8a939b" }}>{artist.bio}</div>
+                  <Typography
+                    variant="body1"
+                    color={"#8a939b"}
+                    sx={bioOpen ? { whiteSpace: "pre-line" } : null}
+                  >
+                    {updatedUser.bio}
+                  </Typography>
                 </Collapse>
-                {artist.bio.length > 250 && (
+                {(artist.bio.length > 250 || artist.bio.includes("\n")) && (
                   <div
                     style={{ cursor: "pointer", marginTop: 10 }}
                     onClick={() => setBioOpen(!bioOpen)}
@@ -317,8 +366,8 @@ const Artist = ({ artist }: { artist: User }) => {
         <Spacer y={1} />
 
         <CollectionList
-          selectedCollection={selectedCollection}
-          setSelectedCollection={setSelectedCollection}
+          selectedCollectionId={selectedCollectionId}
+          setSelectedCollectionId={setSelectedCollectionId}
           openEditDialog={() => setEditDialogOpen(true)}
         />
 
@@ -334,20 +383,22 @@ const Artist = ({ artist }: { artist: User }) => {
               <ArtPreview
                 key={artwork.id}
                 data={artwork}
-                collection={selectedCollection}
+                collectionId={selectedCollectionId}
               />
             ))}
           </GalleryGrid>
         )}
       </div>
 
-      <EditCollectionDialog
-        selectedCollection={selectedCollection}
-        open={editDialogOpen}
-        setOpen={setEditDialogOpen}
-      />
+      {editDialogOpen && (
+        <EditCollectionDialog
+          selectedCollectionId={selectedCollectionId}
+          open={editDialogOpen}
+          setOpen={setEditDialogOpen}
+        />
+      )}
       {showAllSelected && <ArtDialog />}
-    </div>
+    </main>
   );
 };
 
