@@ -4,29 +4,7 @@ import React from "react";
 import Layout from "../../../components/Layout";
 import ArtistPage from "../../../components/Profile/Artist";
 import { useArtist } from "../../../utils/hooks/useQueryData";
-
-/** TODO!! check back later if Prisma supports this in serverless environment. */
-
-// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-//   const id = params.artist_id as any;
-//   console.log(`id: ${id}`);
-
-//   console.log("Grabbing Prisma shit");
-//   const artist: ArtistDocument = await prisma.user.findUnique({
-//     where: { id },
-//   });
-//   console.log("Done grabbing prisma shit");
-//   console.log({ artist });
-
-//   artist.coverPic = "/artist/cover.jpg"; // TODO: change later, mock for now
-//   return {
-//     props: {
-//       data: {
-//         artist: {},
-//       },
-//     },
-//   };
-// };
+import { GetServerSideProps } from "next";
 
 const LoadingIndicator = () => (
   <div style={{ textAlign: "center", padding: "100px 24px" }}>
@@ -34,7 +12,9 @@ const LoadingIndicator = () => (
   </div>
 );
 
-const Artist = () => {
+const Artist = (props) => {
+  console.log(props);
+
   const router = useRouter();
   const artistId = router.query?.artist_id as string;
 
@@ -45,6 +25,24 @@ const Artist = () => {
       {isLoading ? <LoadingIndicator /> : <ArtistPage artist={artist} />}
     </Layout>
   );
+};
+
+/** TODO!! check back later if Prisma supports this in serverless environment. */
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const id = params.artist_id as string;
+
+  const artist = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  return {
+    props: {
+      data: {
+        artist: JSON.parse(JSON.stringify(artist)),
+      },
+    },
+  };
 };
 
 export default Artist;
