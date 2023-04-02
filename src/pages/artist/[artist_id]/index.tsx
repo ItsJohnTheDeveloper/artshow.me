@@ -1,17 +1,8 @@
 import React from "react";
-import { CircularProgress } from "@mui/material";
-import { useRouter } from "next/router";
 import Layout from "../../../components/Layout";
 import ArtistPage from "../../../components/Profile/Artist";
-import { useArtist } from "../../../utils/hooks/useQueryData";
-import { GetServerSideProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import prisma from "../../../../lib/prisma";
-
-const LoadingIndicator = () => (
-  <div style={{ textAlign: "center", padding: "100px 24px" }}>
-    <CircularProgress />
-  </div>
-);
 
 const Artist = (props) => {
   console.log(props);
@@ -28,8 +19,17 @@ const Artist = (props) => {
   );
 };
 
-/** TODO!! check back later if Prisma supports this in serverless environment. */
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const artists = await prisma.user.findMany();
+
+  const paths = artists.map((artist) => ({
+    params: { artist_id: artist.id },
+  }));
+
+  return { paths, fallback: false };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const id = params.artist_id as string;
 
   const artist = await prisma.user.findUnique({
