@@ -62,7 +62,8 @@ const Collection = () => {
         details={{ title: artwork?.name }}
       />
 
-      <Layout pageSpacing showCrumbs>
+      <Layout showCrumbs>
+        <Spacer y={9} />
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={6} lg={6} xl={7}>
             <img
@@ -101,13 +102,14 @@ const Collection = () => {
         <Spacer y={8} />
         <Divider />
         <Spacer y={4} />
-
-        <Typography variant="body1">
-          More from
-          <Typography variant="h4" fontStyle={"italic"}>
-            {collection?.name}
+        <div style={{ padding: "0px 24px" }}>
+          <Typography variant="body1">
+            More from
+            <Typography variant="h4" fontStyle={"italic"}>
+              {collection?.name}
+            </Typography>
           </Typography>
-        </Typography>
+        </div>
         <GalleryGrid xl={6}>
           {otherArtInCollection?.map(
             (painting) =>
@@ -115,7 +117,7 @@ const Collection = () => {
                 <ArtPreview
                   key={painting.id}
                   data={painting}
-                  collection={collection}
+                  collectionId={collection.id}
                 />
               )
           )}

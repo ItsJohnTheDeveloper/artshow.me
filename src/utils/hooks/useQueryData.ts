@@ -45,6 +45,16 @@ const useArtistsCollections = (id: string) => {
   return { data, isLoading: url ? !isError && !data : true, isError, mutate };
 };
 
+const useArtistsCollection = (id: string) => {
+  let url = null;
+
+  if (id !== "all") {
+    url = `/collections/${id}`;
+  }
+  const { data, error: isError, mutate } = useSWR(url, fetcher);
+  return { data, isLoading: url ? !isError && !data : true, isError, mutate };
+};
+
 const useArtist = (id: string) => {
   const url = id ? `/users/${id}` : null;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
@@ -68,6 +78,7 @@ export {
   useCollectionArt,
   useArtistsPaintings,
   useArtistsCollections,
+  useArtistsCollection,
   useArtist,
   useColsByPainting,
 };
