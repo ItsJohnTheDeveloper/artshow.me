@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import prisma from "../../../lib/prisma";
 
 const index = (props) => {
   console.log(props);

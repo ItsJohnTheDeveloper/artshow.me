@@ -12,9 +12,7 @@ const LoadingIndicator = () => (
   </div>
 );
 
-const Artist = (props) => {
-  console.log(props);
-
+const Artist = () => {
   const router = useRouter();
   const artistId = router.query?.artist_id as string;
 
@@ -29,20 +27,20 @@ const Artist = (props) => {
 
 /** TODO!! check back later if Prisma supports this in serverless environment. */
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const id = params.artist_id as string;
+// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+//   const id = params.artist_id as string;
 
-  const artist = await prisma.user.findUnique({
-    where: { id },
-  });
+//   const artist = await prisma.user.findUnique({
+//     where: { id },
+//   });
 
-  return {
-    props: {
-      data: {
-        artist: JSON.parse(JSON.stringify(artist)),
-      },
-    },
-  };
-};
+//   return {
+//     props: {
+//       data: {
+//         artist: JSON.parse(JSON.stringify(artist)),
+//       },
+//     },
+//   };
+// };
 
 export default Artist;
