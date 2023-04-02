@@ -295,12 +295,7 @@ const Artist = ({ artist }: { artist: User }) => {
               <>
                 <h1>{updatedUser.name}</h1>
                 <Collapse
-                  collapsedSize={
-                    updatedUser.bio.length > 100 ||
-                    updatedUser.bio.includes("\n")
-                      ? 30
-                      : updatedUser.bio.length
-                  }
+                  collapsedSize={"34px"}
                   in={bioOpen}
                   style={{ transformOrigin: "0 0 0" }}
                   timeout={800}
@@ -313,7 +308,7 @@ const Artist = ({ artist }: { artist: User }) => {
                     {updatedUser.bio}
                   </Typography>
                 </Collapse>
-                {(updatedUser.bio.length > 250 ||
+                {(updatedUser.bio.length > 107 ||
                   updatedUser.bio.includes("\n")) && (
                   <div
                     style={{ cursor: "pointer", marginTop: 10 }}
