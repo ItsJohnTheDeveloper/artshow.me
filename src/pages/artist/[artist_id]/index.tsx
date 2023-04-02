@@ -3,17 +3,26 @@ import Layout from "../../../components/Layout";
 import ArtistPage from "../../../components/Profile/Artist";
 import { GetStaticPaths, GetStaticProps } from "next";
 import prisma from "../../../../lib/prisma";
+import Head from "next/head";
+import { User } from "@prisma/client";
 
 const Artist = (props) => {
   console.log(props);
-  const artist = props.data.artist;
+  const artist = props.data.artist as User;
 
-  if (!artist) {
-    return <div>404 - artist not found</div>;
-  }
+  // Create a truncated version of the bio for the meta description
+  const seoBio =
+    artist.bio.slice(0, 150) + (artist.bio.length > 150 ? "..." : "");
 
   return (
     <Layout showCrumbs>
+      <Head>
+        <title>{artist.name} / Art Gallery App</title>
+        <meta
+          name="description"
+          content={`Artist: ${artist.name} - ${seoBio}`}
+        />
+      </Head>
       <ArtistPage artist={artist} />
     </Layout>
   );
