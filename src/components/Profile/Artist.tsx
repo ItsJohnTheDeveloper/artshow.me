@@ -164,6 +164,7 @@ const Artist = ({ artist }: { artist: User }) => {
           }}
         >
           <StyledAvatar
+            imgProps={{ referrerPolicy: "no-referrer" }}
             alt="profilename"
             src={uploadedProfilePic ?? artist?.profilePic ?? artist?.image} // order of precedence is uploaded image (edit), profile pic, google image
             sx={{ width: 128, height: 128 }}

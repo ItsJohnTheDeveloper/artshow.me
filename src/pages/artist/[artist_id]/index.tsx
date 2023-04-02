@@ -15,17 +15,16 @@ const LoadingIndicator = () => (
 
 const Artist = (props) => {
   console.log(props);
+  const artist = props.data.artist;
 
-  const router = useRouter();
-  const artistId = router.query?.artist_id as string;
-
-  // const { data: artist, isLoading } = useArtist(artistId);
+  if (!artist) {
+    return <div>404 - artist not found</div>;
+  }
 
   return (
-    <div>open console to view logs</div>
-    // <Layout showCrumbs>
-    //   {isLoading ? <LoadingIndicator /> : <ArtistPage artist={artist} />}
-    // </Layout>
+    <Layout showCrumbs>
+      <ArtistPage artist={artist} />
+    </Layout>
   );
 };
 
