@@ -14,7 +14,7 @@ const Artist = (props) => {
     artist.bio.slice(0, 150) + (artist.bio.length > 150 ? "..." : "");
 
   return (
-    <Layout showCrumbs>
+    <Layout showCrumbs={false}>
       <Head>
         <title>{`${artist.name} / Art Gallery App`}</title>
         <meta
@@ -22,7 +22,8 @@ const Artist = (props) => {
           content={`Artist: ${artist.name} - ${seoBio}`}
         />
       </Head>
-      <ArtistPage artist={artist} />
+      <pre>{JSON.stringify(artist, null, 2)}</pre>
+      {/* <ArtistPage artist={artist} /> */}
     </Layout>
   );
 };
@@ -43,6 +44,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const artist = await prisma.user.findUnique({
     where: { id },
   });
+
+  console.log("inside getStaticProps: ", artist);
 
   return {
     props: {
