@@ -139,7 +139,7 @@ const Artist = ({ artist }: { artist: User }) => {
         },
       });
       globalMutate(`/users/${artist.id}`, data);
-      setUpdatedUser({ ...artist, name: data.name, bio: data.bio });
+      setUpdatedUser(data);
       setInEditMode(false);
     } catch (err) {
       console.error(err);
