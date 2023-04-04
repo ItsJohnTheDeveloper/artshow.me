@@ -1,10 +1,10 @@
 import React from "react";
-import Layout from "../../../components/Layout";
-import ArtistPage from "../../../components/Profile/Artist";
-import { GetStaticPaths, GetStaticProps } from "next";
-import prisma from "../../../../lib/prisma";
 import Head from "next/head";
 import { User } from "@prisma/client";
+import { GetStaticPaths, GetStaticProps } from "next";
+import Layout from "../../../components/Layout";
+import ArtistPage from "../../../components/Profile/Artist";
+import prisma from "../../../../lib/prisma";
 
 const Artist = (props) => {
   const artist = props.data.artist as User;
@@ -22,8 +22,7 @@ const Artist = (props) => {
           content={`Artist: ${artist.name} - ${seoBio}`}
         />
       </Head>
-      <pre>{JSON.stringify(artist, null, 2)}</pre>
-      {/* <ArtistPage artist={artist} /> */}
+      <ArtistPage artist={artist} />
     </Layout>
   );
 };
@@ -44,8 +43,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const artist = await prisma.user.findUnique({
     where: { id },
   });
-
-  console.log("inside getStaticProps: ", artist);
 
   return {
     props: {
