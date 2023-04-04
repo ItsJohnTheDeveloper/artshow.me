@@ -1,28 +1,33 @@
 import React from "react";
-import Layout from "../../../components/Layout";
-import ArtistPage from "../../../components/Profile/Artist";
-import { GetStaticPaths, GetStaticProps } from "next";
-import prisma from "../../../../lib/prisma";
 import Head from "next/head";
 import { User } from "@prisma/client";
+import { GetStaticPaths, GetStaticProps } from "next";
+import Layout from "../../../components/Layout";
+import ArtistPage from "../../../components/Profile/Artist";
+import prisma from "../../../../lib/prisma";
+import { useArtist } from "../../../utils/hooks/useQueryData";
+import { useRouter } from "next/router";
 
 const Artist = (props) => {
-  const artist = props.data.artist as User;
+  const ssrArtist = props.data.artist as User;
+  console.log({ serverSideRenderedArtist: ssrArtist });
+
+  const { data: artist, isLoading } = useArtist(ssrArtist.id as string);
 
   // Create a truncated version of the bio for the meta description
   const seoBio =
-    artist.bio.slice(0, 150) + (artist.bio.length > 150 ? "..." : "");
+    ssrArtist.bio.slice(0, 150) + (ssrArtist.bio.length > 150 ? "..." : "");
 
   return (
-    <Layout showCrumbs>
+    <Layout showCrumbs={false}>
       <Head>
-        <title>{`${artist.name} / Art Gallery App`}</title>
+        <title>{`${ssrArtist.name} / Art Gallery App`}</title>
         <meta
           name="description"
-          content={`Artist: ${artist.name} - ${seoBio}`}
+          content={`Artist: ${ssrArtist.name} - ${seoBio}`}
         />
       </Head>
-      <ArtistPage artist={artist} />
+      {isLoading ? <div>Loading...</div> : <ArtistPage artist={artist} />}
     </Layout>
   );
 };
@@ -50,7 +55,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         artist: JSON.parse(JSON.stringify(artist)),
       },
     },
-    revalidate: 5,
+    revalidate: 60,
   };
 };
 
