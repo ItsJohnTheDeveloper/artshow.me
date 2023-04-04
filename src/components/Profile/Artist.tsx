@@ -359,7 +359,7 @@ const Artist = ({ artist }: { artist: User }) => {
           )}
         </StyledProfileWrapper>
       </div>
-      <div style={{ minHeight: "94vh" }}>
+      {/* <div style={{ minHeight: "94vh" }}>
         <Spacer y={1} />
 
         <CollectionList
@@ -394,7 +394,7 @@ const Artist = ({ artist }: { artist: User }) => {
           setOpen={setEditDialogOpen}
         />
       )}
-      {showAllSelected && <ArtDialog />}
+      {showAllSelected && <ArtDialog />} */}
     </main>
   );
 };

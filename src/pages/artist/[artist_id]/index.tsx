@@ -50,7 +50,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         artist: JSON.parse(JSON.stringify(artist)),
       },
     },
-    revalidate: 5,
+    revalidate: 60,
   };
 };
 
