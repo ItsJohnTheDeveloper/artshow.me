@@ -39,7 +39,7 @@ const StyledCoverImage = styled("img")({
 const StyledAvatar = styled(Avatar)({
   border: "2px solid grey",
   margin: "auto",
-  top: -64,
+  top: -75,
   marginBottom: -64,
 });
 
@@ -215,7 +215,7 @@ const Artist = ({ artist }: { artist: User }) => {
             imgProps={{ referrerPolicy: "no-referrer" }}
             alt="profilename"
             src={uploadedProfilePic ?? artist?.profilePic ?? artist?.image} // order of precedence is uploaded image (edit), profile pic, google image
-            sx={{ width: 128, height: 128 }}
+            sx={{ width: 150, height: 150 }}
           />
           {inEditMode && (
             <FileImageInputComponent
