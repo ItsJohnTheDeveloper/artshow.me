@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
-import Spacer from "../Spacer";
+import Spacer from "../Common/Spacer";
 import axios from "axios";
 
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";

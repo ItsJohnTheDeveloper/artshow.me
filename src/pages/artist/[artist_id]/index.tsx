@@ -2,7 +2,7 @@ import React from "react";
 import Head from "next/head";
 import { User } from "@prisma/client";
 import { GetStaticPaths, GetStaticProps } from "next";
-import Layout from "../../../components/Layout";
+import Layout from "../../../components/Common/Layout";
 import ArtistPage from "../../../components/Profile/Artist";
 import prisma from "../../../../lib/prisma";
 import { useArtist } from "../../../utils/hooks/useQueryData";
@@ -10,7 +10,6 @@ import { useRouter } from "next/router";
 
 const Artist = (props) => {
   const ssrArtist = props.data.artist as User;
-  console.log({ serverSideRenderedArtist: ssrArtist });
 
   const { data: artist, isLoading } = useArtist(ssrArtist.id as string);
 

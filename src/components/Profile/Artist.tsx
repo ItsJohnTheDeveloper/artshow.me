@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
-import { Button, Collapse, TextField, Typography } from "@mui/material";
+import { Button, Tab, Tabs, TextField, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import { styled } from "@mui/system";
+import { Box, styled } from "@mui/system";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Add, AddAPhoto } from "@mui/icons-material";
-import Spacer from "../Spacer";
-import GalleryGrid from "../Collection/Gallery/GalleryGrid";
+import Spacer from "../Common/Spacer";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { User } from "@prisma/client";
@@ -17,13 +16,10 @@ import {
   handleUploadProfilePicture,
 } from "../../utils/helpers/handleUploadFile";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
-import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
-import EditCollectionDialog from "../Modal/EditCollectionDialog";
-import ArtDialog from "../Collection/Gallery/Dialog/ArtDialog";
-import ArtPreview from "../Collection/Gallery/ArtPreview";
-import CollectionList from "../Collection/CollectionList";
 import AddArtworkDialog from "../Modal/AddArtworkDialog";
+import Gallery from "./Content/Gallery";
+import theme from "../../styles/theme";
+import Biography from "./Content/Biography";
 
 const StyledCoverWrapper = styled("div")({
   height: 220,
@@ -87,16 +83,8 @@ const Artist = ({ artist }: { artist: User }) => {
 
   const { mutate: globalMutate } = useSWRConfig();
 
-  const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
-  const [selectedCollectionId, setSelectedCollectionId] = useState(
-    // TODO: change to artist's default collection
-    showAllOption.id
-  );
-  const showAllSelected = selectedCollectionId === showAllOption.id;
-
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const hiddenProfilePicFileRef = useRef(null);
   const hiddenCoverPicFileRef = useRef(null);
@@ -107,10 +95,7 @@ const Artist = ({ artist }: { artist: User }) => {
     useState(false);
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
-  const { data: gallery, isLoading: isLoadingGallery } = useArtistsPaintings(
-    artistId,
-    selectedCollectionId
-  );
+  const [tabSelected, setTabSelected] = useState(0);
 
   const {
     register,
@@ -292,33 +277,9 @@ const Artist = ({ artist }: { artist: User }) => {
             </StyledEditProfileWrapper>
           ) : (
             <StyledProfileInfo>
-              <>
-                <h1>{updatedUser.name}</h1>
-                <Collapse
-                  collapsedSize={"34px"}
-                  in={bioOpen}
-                  style={{ transformOrigin: "0 0 0" }}
-                  timeout={800}
-                >
-                  <Typography
-                    variant="body1"
-                    color={"#8a939b"}
-                    sx={bioOpen ? { whiteSpace: "pre-line" } : null}
-                  >
-                    {updatedUser.bio}
-                  </Typography>
-                </Collapse>
-                {(updatedUser.bio.length > 107 ||
-                  updatedUser.bio.includes("\n")) && (
-                  <div
-                    style={{ cursor: "pointer", marginTop: 10 }}
-                    onClick={() => setBioOpen(!bioOpen)}
-                  >
-                    {bioOpen ? "Show less" : "Show more"}
-                    <Spacer y={4} />
-                  </div>
-                )}
-              </>
+              <Typography component="h1" sx={{ fontSize: 30, padding: "12px" }}>
+                {updatedUser.name}
+              </Typography>
               {isMyProfile && (
                 <>
                   <div
@@ -359,42 +320,20 @@ const Artist = ({ artist }: { artist: User }) => {
           )}
         </StyledProfileWrapper>
       </div>
-      <div style={{ minHeight: "94vh" }}>
-        <Spacer y={1} />
 
-        <CollectionList
-          selectedCollectionId={selectedCollectionId}
-          setSelectedCollectionId={setSelectedCollectionId}
-          openEditDialog={() => setEditDialogOpen(true)}
-        />
-
-        {!gallery?.length && !isLoadingGallery && (
-          <Typography variant="h5" marginLeft={3}>
-            This collection is empty
-          </Typography>
-        )}
-
-        {!!(gallery?.length && !isLoadingGallery) && (
-          <GalleryGrid>
-            {gallery?.map((artwork) => (
-              <ArtPreview
-                key={artwork.id}
-                data={artwork}
-                collectionId={selectedCollectionId}
-              />
-            ))}
-          </GalleryGrid>
-        )}
-      </div>
-
-      {editDialogOpen && (
-        <EditCollectionDialog
-          selectedCollectionId={selectedCollectionId}
-          open={editDialogOpen}
-          setOpen={setEditDialogOpen}
-        />
-      )}
-      {showAllSelected && <ArtDialog />}
+      <Box
+        sx={{
+          padding: "0px 24px",
+          borderBottom: `1px solid ${theme.palette.background.border}`,
+        }}
+      >
+        <Tabs value={tabSelected} onChange={(_, tab) => setTabSelected(tab)}>
+          <Tab label="gallery" />
+          <Tab label="biography" />
+        </Tabs>
+      </Box>
+      {tabSelected === 0 && <Gallery />}
+      {tabSelected === 1 && <Biography />}
     </main>
   );
 };

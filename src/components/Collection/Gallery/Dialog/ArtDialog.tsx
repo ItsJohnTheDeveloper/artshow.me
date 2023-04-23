@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 
 import { useArtwork } from "../../../../utils/hooks/useQueryData";
-import Spacer from "../../../Spacer";
+import Spacer from "../../../Common/Spacer";
 import EditArtForm from "./EditArtForm";
 import theme from "../../../../styles/theme";
 import FullScreenImageViewer from "../../../Modal/FullScreenImageViewer";

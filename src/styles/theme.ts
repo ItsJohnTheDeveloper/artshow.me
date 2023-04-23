@@ -1,16 +1,24 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, Theme } from "@mui/material/styles";
 import { red } from "@mui/material/colors";
 
+declare module "@mui/material/styles" {
+  interface TypeBackground {
+    highContrast: string;
+    border: string;
+  }
+  interface PaletteOptions {
+    colors?: {
+      transparent?: string;
+      linearGradient?: string;
+      boxShadow?: string;
+    };
+  }
+}
+
 // Create a theme instance.
-const theme = createTheme({
+const theme: Theme = createTheme({
   palette: {
     mode: "dark",
-    background: {
-      default: "#1b2631", // header OLD #212730
-      paper: "#193264", // paper OLD #303339
-      // @ts-expect-error
-      highContrast: "#99CCFF",
-    },
     primary: {
       main: "#556cd6",
     },
@@ -23,11 +31,18 @@ const theme = createTheme({
     text: {
       primary: "#e3e3e3",
     },
-  },
-  colors: {
-    transparent: "#00000000",
-    linearGradient: "linear-gradient(to right, #99CCFF, #003366)",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+    background: {
+      default: "#1b2631",
+      paper: "#193264",
+      highContrast: "#99CCFF",
+      border: "#616161",
+    },
+
+    colors: {
+      transparent: "#00000000",
+      linearGradient: "linear-gradient(to right, #99CCFF, #003366)",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+    },
   },
 });
 

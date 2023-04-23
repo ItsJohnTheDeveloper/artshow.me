@@ -9,8 +9,8 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import Layout from "../../../../components/Layout";
-import Spacer from "../../../../components/Spacer";
+import Layout from "../../../../components/Common/Layout";
+import Spacer from "../../../../components/Common/Spacer";
 import ArtPreview from "../../../../components/Collection/Gallery/ArtPreview";
 import GalleryGrid from "../../../../components/Collection/Gallery/GalleryGrid";
 import theme from "../../../../styles/theme";

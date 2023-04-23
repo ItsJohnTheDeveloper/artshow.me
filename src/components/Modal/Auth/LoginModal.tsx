@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import { Close } from "@mui/icons-material";
 import { useSession, signIn } from "next-auth/react";
 
-import Spacer from "../../Spacer";
+import Spacer from "../../Common/Spacer";
 import { useEffect } from "react";
 import theme from "../../../styles/theme";
 

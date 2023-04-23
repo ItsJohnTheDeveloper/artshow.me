@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import theme from "../../styles/theme";
-import Spacer from "../Spacer";
+import Spacer from "../Common/Spacer";
 
 type CreateCollectionForm = {
   email: string;

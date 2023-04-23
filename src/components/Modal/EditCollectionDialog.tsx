@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useSession } from "next-auth/react";
 
-import Spacer from "../Spacer";
+import Spacer from "../Common/Spacer";
 import { handleUploadPaintingPicture } from "../../utils/helpers/handleUploadFile";
 import {
   useArtistsCollection,

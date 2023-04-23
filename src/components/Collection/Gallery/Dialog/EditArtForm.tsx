@@ -1,10 +1,8 @@
-import { Photo } from "@mui/icons-material";
 import {
   Alert,
   Button,
   CircularProgress,
   FormHelperText,
-  IconButton,
   Snackbar,
   TextField,
 } from "@mui/material";
@@ -21,7 +19,7 @@ import {
 } from "../../../../utils/hooks/useQueryData";
 import ArtDimensionsForm from "../../../Common/ArtDimensionsForm";
 import ReactSelect from "../../../Common/ReactSelect";
-import Spacer from "../../../Spacer";
+import Spacer from "../../../Common/Spacer";
 
 const EditArtForm = ({ data, handleCancelEditing, boundMutate }) => {
   const methods = useForm();
