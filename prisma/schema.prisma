@@ -36,6 +36,7 @@ model User {
   image         String?
   emailVerified DateTime?
   profilePic    String?
+  bioPic        String?
   coverPic      String?
   bio           String    @default("")
   createdAt     DateTime  @default(now())

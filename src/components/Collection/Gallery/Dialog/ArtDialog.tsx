@@ -135,7 +135,9 @@ const ArtDialog = () => {
                 onClick={() => setFullScreenViewerOpen(true)}
               />
               <Spacer y={2} />
-              <Typography variant="h3">{name}</Typography>
+              <Typography variant="h3" fontSize="34px">
+                {name}
+              </Typography>
               <Spacer y={0.5} />
               <Typography variant="h5">{description}</Typography>
               {showSize && (

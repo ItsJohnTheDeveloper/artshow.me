@@ -1,5 +1,12 @@
 import { useRef, useState } from "react";
-import { Button, Tab, Tabs, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { Box, styled } from "@mui/system";
 import { useForm } from "react-hook-form";
@@ -14,6 +21,7 @@ import { useSWRConfig } from "swr";
 import {
   handleUploadCoverPicture,
   handleUploadProfilePicture,
+  handleUploadBioPicture,
 } from "../../utils/helpers/handleUploadFile";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
 import AddArtworkDialog from "../Modal/AddArtworkDialog";
@@ -21,10 +29,10 @@ import Gallery from "./Content/Gallery";
 import theme from "../../styles/theme";
 import Biography from "./Content/Biography";
 
-const StyledCoverWrapper = styled("div")({
-  height: 220,
+const StyledCoverWrapper = styled("div")((props: { isMobile: boolean }) => ({
+  height: props.isMobile ? 128 : 220,
   width: "100%",
-});
+}));
 
 const StyledCoverImage = styled("img")({
   objectFit: "cover",
@@ -81,6 +89,8 @@ const Artist = ({ artist }: { artist: User }) => {
   const router = useRouter();
   const artistId = router.query?.artist_id as string;
 
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   const { mutate: globalMutate } = useSWRConfig();
 
   const [inEditMode, setInEditMode] = useState(false);
@@ -88,8 +98,11 @@ const Artist = ({ artist }: { artist: User }) => {
 
   const hiddenProfilePicFileRef = useRef(null);
   const hiddenCoverPicFileRef = useRef(null);
+  const hiddenBioPicFileRef = useRef(null);
+
   const [uploadedProfilePic, setUploadedProfilePic] = useState(null);
   const [uploadedCoverPic, setUploadedCoverPic] = useState(null);
+  const [uploadedBioPic, setUploadedBioPic] = useState(null);
 
   const [createCollectionDialogOpen, setCreateCollectionDialogOpen] =
     useState(false);
@@ -116,6 +129,9 @@ const Artist = ({ artist }: { artist: User }) => {
     }
     if (uploadedCoverPic) {
       formData.coverPic = uploadedCoverPic;
+    }
+    if (uploadedBioPic) {
+      formData.bioPic = uploadedBioPic;
     }
     try {
       const { data } = await axios.patch(`/users/${artist.id}`, formData, {
@@ -165,7 +181,7 @@ const Artist = ({ artist }: { artist: User }) => {
           paddingBottom: inEditMode ? 16 : "unset",
         }}
       >
-        <StyledCoverWrapper>
+        <StyledCoverWrapper isMobile={isMobile}>
           {/* TODO: add a default image here if they don't have one. */}
           <StyledCoverImage src={uploadedCoverPic ?? artist?.coverPic} />
         </StyledCoverWrapper>
@@ -274,6 +290,39 @@ const Artist = ({ artist }: { artist: User }) => {
                   {...register("bio")}
                 />
               </form>
+              <Spacer y={2} />
+              <Typography component="h5" textAlign={"left"}>
+                Biography Photo
+              </Typography>
+              <Spacer y={1} />
+              <Avatar
+                imgProps={{ referrerPolicy: "no-referrer" }}
+                alt="biography picture"
+                src={uploadedBioPic ?? artist?.bioPic} // order of precedence is uploaded image (edit), profile pic, google image
+                sx={{ width: 75, height: 75 }}
+              />
+              <FileImageInputComponent
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  try {
+                    handleUploadBioPicture(
+                      file,
+                      session.user,
+                      (url: string) => {
+                        setUploadedBioPic(url);
+                      }
+                    );
+                  } catch (err) {}
+                }}
+                reference={hiddenBioPicFileRef}
+                styles={{
+                  position: "relative",
+                  bottom: 18,
+                  right: -52,
+                  marginBottom: -14,
+                  cursor: "pointer",
+                }}
+              />
             </StyledEditProfileWrapper>
           ) : (
             <StyledProfileInfo>

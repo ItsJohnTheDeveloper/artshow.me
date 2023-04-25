@@ -75,7 +75,9 @@ const Collection = () => {
 
           <Grid item xs={12} sm={6} md={6} lg={6} xl={5}>
             <StyledArtPaper>
-              <Typography variant="h3">{artwork?.name}</Typography>
+              <Typography variant="h3" fontSize="34px">
+                {artwork?.name}
+              </Typography>
               <Spacer y={0.5} />
               <Typography variant="body1">{artwork?.description}</Typography>
               {artwork?.sizeUnit && (
@@ -105,9 +107,11 @@ const Collection = () => {
         <div style={{ padding: "0px 24px" }}>
           <Typography variant="body1">
             More from
-            <Typography variant="h4" fontStyle={"italic"}>
-              {collection?.name}
-            </Typography>
+            {collection?.name && (
+              <Typography variant="h4" fontStyle={"italic"}>
+                {collection.name}
+              </Typography>
+            )}
           </Typography>
         </div>
         <GalleryGrid xl={6}>

@@ -27,6 +27,7 @@ const CollectionList = ({
         top: 68,
         padding: "5px 24px",
         backgroundColor: theme.palette.background.default + "f2",
+        zIndex: 999,
       }}
     >
       <div style={{ display: "flex", gap: 6, overflow: "overlay" }}>
