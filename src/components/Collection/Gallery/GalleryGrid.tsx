@@ -8,11 +8,11 @@ const GalleryGrid = ({ children, xl }: GalleryGridProps) => {
   return (
     <Grid
       style={{
-        padding: "42px 24px",
+        padding: "42px 16px",
       }}
       container
-      spacing={{ xs: 1, sm: 2, md: 2, lg: 1.5, xl: 2 }}
-      columns={{ xs: 4, sm: 8, md: 6, lg: 8, xl: xl || 10 }}
+      spacing={{ xs: 2, sm: 2, md: 3, lg: 3, xl: 3 }}
+      columns={{ xs: 4, sm: 8, md: 8, lg: 6, xl: xl || 6 }}
     >
       {children}
     </Grid>

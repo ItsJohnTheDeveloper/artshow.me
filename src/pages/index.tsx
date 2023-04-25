@@ -1,8 +1,8 @@
 import { Typography } from "@mui/material";
 import { User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
-import Layout from "../components/Layout";
-import Spacer from "../components/Spacer";
+import Layout from "../components/Common/Layout";
+import Spacer from "../components/Common/Spacer";
 
 const Home = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -22,7 +22,7 @@ const Home = () => {
 
   return (
     <Layout>
-      <main className="page">
+      <main>
         <Spacer y={2} />
         <Typography variant="h5">
           {"Artist Profiles (current profiles)"}

@@ -4,7 +4,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Header from "./Header";
-import theme from "../styles/theme";
+import theme from "../../styles/theme";
+import Footer from "./Footer";
 
 const breadCrumbStyles = {
   padding: "14px 24px",
@@ -89,6 +90,7 @@ const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
 
       <style jsx global>{`
         html {
+          height: 100%;
           box-sizing: border-box;
           margin: 0; // will this fix the initial paint margin???
           padding: 0;
@@ -109,6 +111,8 @@ const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
         }
 
         body {
+          height: 100%;
+
           background-color: ${theme.palette.background.default};
           margin: 0;
           padding: 0;
@@ -128,6 +132,8 @@ const Layout = ({ children, pageSpacing, showCrumbs = false }: LayoutProps) => {
           background-color: #353840;
         }
       `}</style>
+
+      {/* <Footer /> */}
     </ThemeProvider>
   );
 };

@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel, MenuItem, TextField } from "@mui/material";
 import { useFormContext } from "react-hook-form";
-import Spacer from "../Spacer";
+import Spacer from "./Spacer";
 
 const sizeMap = [{ value: "in", label: "in" }];
 

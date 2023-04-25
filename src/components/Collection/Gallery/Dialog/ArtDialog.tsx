@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 
 import { useArtwork } from "../../../../utils/hooks/useQueryData";
-import Spacer from "../../../Spacer";
+import Spacer from "../../../Common/Spacer";
 import EditArtForm from "./EditArtForm";
 import theme from "../../../../styles/theme";
 import FullScreenImageViewer from "../../../Modal/FullScreenImageViewer";
@@ -135,7 +135,9 @@ const ArtDialog = () => {
                 onClick={() => setFullScreenViewerOpen(true)}
               />
               <Spacer y={2} />
-              <Typography variant="h3">{name}</Typography>
+              <Typography variant="h3" fontSize="34px">
+                {name}
+              </Typography>
               <Spacer y={0.5} />
               <Typography variant="h5">{description}</Typography>
               {showSize && (

@@ -17,9 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import { Menu, Close, Logout, ContactPage, Search } from "@mui/icons-material";
-import LoginModal from "./Modal/Auth/LoginModal";
+import LoginModal from "../Modal/Auth/LoginModal";
 import Spacer from "./Spacer";
-import theme from "../styles/theme";
+import theme from "../../styles/theme";
 
 const disableCenterNav = true;
 

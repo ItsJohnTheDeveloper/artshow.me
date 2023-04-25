@@ -1,12 +1,18 @@
 import { useRef, useState } from "react";
-import { Button, Collapse, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import { styled } from "@mui/system";
+import { Box, styled } from "@mui/system";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Add, AddAPhoto } from "@mui/icons-material";
-import Spacer from "../Spacer";
-import GalleryGrid from "../Collection/Gallery/GalleryGrid";
+import Spacer from "../Common/Spacer";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { User } from "@prisma/client";
@@ -15,20 +21,18 @@ import { useSWRConfig } from "swr";
 import {
   handleUploadCoverPicture,
   handleUploadProfilePicture,
+  handleUploadBioPicture,
 } from "../../utils/helpers/handleUploadFile";
 import CreateCollectionDialog from "../Modal/CreateCollectionDialog";
-import { showAllOption } from "../../utils/helpers/getDefaultValues";
-import { useArtistsPaintings } from "../../utils/hooks/useQueryData";
-import EditCollectionDialog from "../Modal/EditCollectionDialog";
-import ArtDialog from "../Collection/Gallery/Dialog/ArtDialog";
-import ArtPreview from "../Collection/Gallery/ArtPreview";
-import CollectionList from "../Collection/CollectionList";
 import AddArtworkDialog from "../Modal/AddArtworkDialog";
+import Gallery from "./Content/Gallery";
+import theme from "../../styles/theme";
+import Biography from "./Content/Biography";
 
-const StyledCoverWrapper = styled("div")({
-  height: 220,
+const StyledCoverWrapper = styled("div")((props: { isMobile: boolean }) => ({
+  height: props.isMobile ? 128 : 220,
   width: "100%",
-});
+}));
 
 const StyledCoverImage = styled("img")({
   objectFit: "cover",
@@ -85,32 +89,26 @@ const Artist = ({ artist }: { artist: User }) => {
   const router = useRouter();
   const artistId = router.query?.artist_id as string;
 
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   const { mutate: globalMutate } = useSWRConfig();
 
-  const [bioOpen, setBioOpen] = useState(false);
   const [inEditMode, setInEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState(artist);
-  const [selectedCollectionId, setSelectedCollectionId] = useState(
-    // TODO: change to artist's default collection
-    showAllOption.id
-  );
-  const showAllSelected = selectedCollectionId === showAllOption.id;
-
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const hiddenProfilePicFileRef = useRef(null);
   const hiddenCoverPicFileRef = useRef(null);
+  const hiddenBioPicFileRef = useRef(null);
+
   const [uploadedProfilePic, setUploadedProfilePic] = useState(null);
   const [uploadedCoverPic, setUploadedCoverPic] = useState(null);
+  const [uploadedBioPic, setUploadedBioPic] = useState(null);
 
   const [createCollectionDialogOpen, setCreateCollectionDialogOpen] =
     useState(false);
   const [addArtworkDialogOpen, setAddArtworkDialogOpen] = useState(false);
 
-  const { data: gallery, isLoading: isLoadingGallery } = useArtistsPaintings(
-    artistId,
-    selectedCollectionId
-  );
+  const [tabSelected, setTabSelected] = useState(0);
 
   const {
     register,
@@ -131,6 +129,9 @@ const Artist = ({ artist }: { artist: User }) => {
     }
     if (uploadedCoverPic) {
       formData.coverPic = uploadedCoverPic;
+    }
+    if (uploadedBioPic) {
+      formData.bioPic = uploadedBioPic;
     }
     try {
       const { data } = await axios.patch(`/users/${artist.id}`, formData, {
@@ -180,7 +181,7 @@ const Artist = ({ artist }: { artist: User }) => {
           paddingBottom: inEditMode ? 16 : "unset",
         }}
       >
-        <StyledCoverWrapper>
+        <StyledCoverWrapper isMobile={isMobile}>
           {/* TODO: add a default image here if they don't have one. */}
           <StyledCoverImage src={uploadedCoverPic ?? artist?.coverPic} />
         </StyledCoverWrapper>
@@ -289,36 +290,45 @@ const Artist = ({ artist }: { artist: User }) => {
                   {...register("bio")}
                 />
               </form>
+              <Spacer y={2} />
+              <Typography component="h5" textAlign={"left"}>
+                Biography Photo
+              </Typography>
+              <Spacer y={1} />
+              <Avatar
+                imgProps={{ referrerPolicy: "no-referrer" }}
+                alt="biography picture"
+                src={uploadedBioPic ?? artist?.bioPic} // order of precedence is uploaded image (edit), profile pic, google image
+                sx={{ width: 75, height: 75 }}
+              />
+              <FileImageInputComponent
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  try {
+                    handleUploadBioPicture(
+                      file,
+                      session.user,
+                      (url: string) => {
+                        setUploadedBioPic(url);
+                      }
+                    );
+                  } catch (err) {}
+                }}
+                reference={hiddenBioPicFileRef}
+                styles={{
+                  position: "relative",
+                  bottom: 18,
+                  right: -52,
+                  marginBottom: -14,
+                  cursor: "pointer",
+                }}
+              />
             </StyledEditProfileWrapper>
           ) : (
             <StyledProfileInfo>
-              <>
-                <h1>{updatedUser.name}</h1>
-                <Collapse
-                  collapsedSize={"34px"}
-                  in={bioOpen}
-                  style={{ transformOrigin: "0 0 0" }}
-                  timeout={800}
-                >
-                  <Typography
-                    variant="body1"
-                    color={"#8a939b"}
-                    sx={bioOpen ? { whiteSpace: "pre-line" } : null}
-                  >
-                    {updatedUser.bio}
-                  </Typography>
-                </Collapse>
-                {(updatedUser.bio.length > 107 ||
-                  updatedUser.bio.includes("\n")) && (
-                  <div
-                    style={{ cursor: "pointer", marginTop: 10 }}
-                    onClick={() => setBioOpen(!bioOpen)}
-                  >
-                    {bioOpen ? "Show less" : "Show more"}
-                    <Spacer y={4} />
-                  </div>
-                )}
-              </>
+              <Typography component="h1" sx={{ fontSize: 30, padding: "12px" }}>
+                {updatedUser.name}
+              </Typography>
               {isMyProfile && (
                 <>
                   <div
@@ -359,42 +369,20 @@ const Artist = ({ artist }: { artist: User }) => {
           )}
         </StyledProfileWrapper>
       </div>
-      <div style={{ minHeight: "94vh" }}>
-        <Spacer y={1} />
 
-        <CollectionList
-          selectedCollectionId={selectedCollectionId}
-          setSelectedCollectionId={setSelectedCollectionId}
-          openEditDialog={() => setEditDialogOpen(true)}
-        />
-
-        {!gallery?.length && !isLoadingGallery && (
-          <Typography variant="h5" marginLeft={3}>
-            This collection is empty
-          </Typography>
-        )}
-
-        {!!(gallery?.length && !isLoadingGallery) && (
-          <GalleryGrid>
-            {gallery?.map((artwork) => (
-              <ArtPreview
-                key={artwork.id}
-                data={artwork}
-                collectionId={selectedCollectionId}
-              />
-            ))}
-          </GalleryGrid>
-        )}
-      </div>
-
-      {editDialogOpen && (
-        <EditCollectionDialog
-          selectedCollectionId={selectedCollectionId}
-          open={editDialogOpen}
-          setOpen={setEditDialogOpen}
-        />
-      )}
-      {showAllSelected && <ArtDialog />}
+      <Box
+        sx={{
+          padding: "0px 24px",
+          borderBottom: `1px solid ${theme.palette.background.border}`,
+        }}
+      >
+        <Tabs value={tabSelected} onChange={(_, tab) => setTabSelected(tab)}>
+          <Tab label="gallery" />
+          <Tab label="biography" />
+        </Tabs>
+      </Box>
+      {tabSelected === 0 && <Gallery />}
+      {tabSelected === 1 && <Biography />}
     </main>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Chip } from "@mui/material";
 import { showAllOption } from "../../utils/helpers/getDefaultValues";
 import { useSession } from "next-auth/react";
-import Spacer from "../Spacer";
+import Spacer from "../Common/Spacer";
 import { useArtistsCollections } from "../../utils/hooks/useQueryData";
 import { useRouter } from "next/router";
 import theme from "../../styles/theme";
@@ -27,6 +27,7 @@ const CollectionList = ({
         top: 68,
         padding: "5px 24px",
         backgroundColor: theme.palette.background.default + "f2",
+        zIndex: 999,
       }}
     >
       <div style={{ display: "flex", gap: 6, overflow: "overlay" }}>
