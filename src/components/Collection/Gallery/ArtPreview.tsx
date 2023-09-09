@@ -16,6 +16,11 @@ const StyleArtImage = styled("img")({
   height: "100%",
   width: "100%",
   borderRadius: 10,
+
+  "&:hover": {
+    transform: "scale(1.04)",
+    transition: "transform .3s",
+  },
 });
 
 const StyledArtPaper = styled(Paper)({
@@ -23,9 +28,9 @@ const StyledArtPaper = styled(Paper)({
   borderRadius: 10,
   cursor: "pointer",
   transition: ".25s ease-out",
-
-  ":hover": {
-    boxShadow: "0px 3px #3b4048",
+  "&:hover .info-text-wrapper": {
+    transform: "scale(1.04)",
+    transition: "transform .3s",
   },
 });
 
@@ -40,6 +45,7 @@ const StyledInfoWrapper = styled("div")({
   padding: "8px 12px",
   bottom: "5px",
   marginLeft: "5px",
+  pointerEvents: "none",
 });
 
 const StyledTitle = styled("h4")({
@@ -90,7 +96,7 @@ const ArtPreview = ({ data, collectionId }) => {
       <StyledArtImageWrapper height={getImageHeight()}>
         <StyleArtImage src={image} />
       </StyledArtImageWrapper>
-      <StyledInfoWrapper>
+      <StyledInfoWrapper className="info-text-wrapper">
         <StyledColumnRight>
           <StyledTitle>{name}</StyledTitle>
           {sizeUnit && (

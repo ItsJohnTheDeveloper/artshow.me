@@ -16,17 +16,24 @@ import GalleryGrid from "../../../../components/Collection/Gallery/GalleryGrid";
 import theme from "../../../../styles/theme";
 import { useCollectionArt } from "../../../../utils/hooks/useQueryData";
 import FullScreenImageViewer from "../../../../components/Modal/FullScreenImageViewer";
+import useNavScroll from "../../../../utils/hooks/useNavScroll";
 
-const StyledArtPaper = styled(Paper)({
+interface StyledArtPaperProps {
+  top: string | number;
+}
+
+const StyledArtPaper = styled(Paper)<StyledArtPaperProps>(({ top }) => ({
   backgroundColor: theme.palette.background.paper,
   padding: 20,
   marginBottom: 10,
   borderRadius: 10,
   position: "sticky",
-  top: 106,
-});
+  top,
+}));
 
 const Collection = () => {
+  const headerBarHidden = useNavScroll();
+
   const { id, artId } = useRouter().query;
   const { data, isLoading, isError } = useCollectionArt(
     id as string,
@@ -74,7 +81,7 @@ const Collection = () => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={6} lg={6} xl={5}>
-            <StyledArtPaper>
+            <StyledArtPaper top={headerBarHidden ? 16 : 106}>
               <Typography variant="h3" fontSize="34px">
                 {artwork?.name}
               </Typography>
