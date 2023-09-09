@@ -13,6 +13,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Slide,
   TextField,
   Typography,
 } from "@mui/material";
@@ -20,6 +21,7 @@ import { Menu, Close, Logout, ContactPage, Search } from "@mui/icons-material";
 import LoginModal from "../Modal/Auth/LoginModal";
 import Spacer from "./Spacer";
 import theme from "../../styles/theme";
+import useNavScroll from "../../utils/hooks/useNavScroll";
 
 const disableCenterNav = true;
 
@@ -157,40 +159,52 @@ const Header: React.FC = () => {
     );
   };
 
-  return (
-    <nav
-      style={{
-        top: 0,
-        position: "sticky",
-        zIndex: 100,
-        padding: "8px",
-        backgroundColor: theme.palette.background.paper,
-      }}
-    >
-      <Grid container spacing={3}>
-        <Grid item xs>
-          <Link href="/" legacyBehavior>
-            <a
-              className="bold"
-              data-active={isActive("/")}
-              style={{ alignSelf: "center" }}
-            >
-              <img src="/artcade-io-logo.png" style={{ height: 48 }} />
-            </a>
-          </Link>
-        </Grid>
-        {!disableCenterNav && (
-          <Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
-            <CenterNav />
-          </Grid>
-        )}
-        <Grid item xs>
-          <RightNav />
-        </Grid>
-      </Grid>
+  function HideOnScroll({ children }) {
+    const trigger = useNavScroll();
 
-      <LoginModal open={loginModalOpen} setOpen={setLoginModalOpen} />
-    </nav>
+    return (
+      <Slide appear={false} direction="down" in={!trigger}>
+        {children}
+      </Slide>
+    );
+  }
+
+  return (
+    <HideOnScroll>
+      <nav
+        style={{
+          top: 0,
+          position: "sticky",
+          zIndex: 100,
+          padding: "8px",
+          backgroundColor: theme.palette.background.paper,
+        }}
+      >
+        <Grid container spacing={3}>
+          <Grid item xs>
+            <Link href="/" legacyBehavior>
+              <a
+                className="bold"
+                data-active={isActive("/")}
+                style={{ alignSelf: "center" }}
+              >
+                <img src="/artcade-io-logo.png" style={{ height: 48 }} />
+              </a>
+            </Link>
+          </Grid>
+          {!disableCenterNav && (
+            <Grid item xs={8} sm={8} md={8} lg={8} xl={6}>
+              <CenterNav />
+            </Grid>
+          )}
+          <Grid item xs>
+            <RightNav />
+          </Grid>
+        </Grid>
+
+        <LoginModal open={loginModalOpen} setOpen={setLoginModalOpen} />
+      </nav>
+    </HideOnScroll>
   );
 };
 
