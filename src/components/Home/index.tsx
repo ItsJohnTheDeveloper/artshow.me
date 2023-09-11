@@ -14,7 +14,7 @@ import Link from "next/link";
 import { User } from "@prisma/client";
 
 const AvatarBackground = styled.div`
-  padding: 2px;
+  padding: 4px;
   position: relative;
   background: radial-gradient(
         circle at 100% 100%,
@@ -125,7 +125,7 @@ const index = () => {
                   <AvatarBackground>
                     <Avatar
                       style={{
-                        border: "3px solid black",
+                        border: "3px solid #1b2631",
                         borderRadius: "50%",
                         pointerEvents: "none",
                       }}
