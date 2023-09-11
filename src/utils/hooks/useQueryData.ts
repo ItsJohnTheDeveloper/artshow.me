@@ -67,6 +67,13 @@ const useArtist = (id: string) => {
   };
 };
 
+const useFeatArtists = () => {
+  const url = "/users/featured";
+  const props = useSWR(url, fetcher);
+
+  return { isLoading: !props.error || !props.data, ...props };
+};
+
 const useColsByPainting = (id: string) => {
   const url = id ? `/collections/painting/${id}` : null;
   const { data, error: isError, mutate } = useSWR(url, fetcher);
@@ -80,5 +87,6 @@ export {
   useArtistsCollections,
   useArtistsCollection,
   useArtist,
+  useFeatArtists,
   useColsByPainting,
 };
